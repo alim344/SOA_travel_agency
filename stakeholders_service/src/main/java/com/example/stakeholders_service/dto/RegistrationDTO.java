@@ -12,6 +12,10 @@ public class RegistrationDTO {
     private String password;
     private String role;
 
+    private String firstName;
+    private String lastName;
+    private String motto;
+
 
 
     public RegistrationDTO( String email, String password, String username, String role) {

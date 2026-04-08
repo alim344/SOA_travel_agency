@@ -1,6 +1,7 @@
 package com.example.stakeholders_service.service;
 
 import com.example.stakeholders_service.dto.RegistrationDTO;
+import com.example.stakeholders_service.model.Profile;
 import com.example.stakeholders_service.model.User;
 import com.example.stakeholders_service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ public class UserService {
     private RoleService roleService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ProfileService profileService;
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
@@ -46,7 +49,18 @@ public class UserService {
             user.setRole(roleService.findByRoleName("ROLE_TOURIST"));
         }
 
+        Profile profile = new Profile();
+        profile.setFirstName(dto.getFirstName());
+        profile.setLastName(dto.getLastName());
+        profile.setMotto(dto.getMotto());
+
+
+        profile.setUser(user);
+        user.setProfile(profile);
         return userRepository.save(user);
+
     }
+
+
 
 }

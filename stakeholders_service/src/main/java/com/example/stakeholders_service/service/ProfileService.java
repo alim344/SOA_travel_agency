@@ -1,5 +1,6 @@
 package com.example.stakeholders_service.service;
 
+import com.example.stakeholders_service.model.Profile;
 import com.example.stakeholders_service.repository.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,4 +9,9 @@ import org.springframework.stereotype.Service;
 public class ProfileService {
     @Autowired
     private ProfileRepository profileRepository;
+
+
+    public void save(Profile profile) {
+        profileRepository.save(profile);
+    }
 }
