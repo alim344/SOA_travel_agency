@@ -1,24 +1,34 @@
 package com.example.stakeholders_service.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Getter @Setter
-public class Tourist extends User{
+@Table(name = "profiles")
+@Getter
+@Setter
+public class Profile {
+    @Id
+    private Long userId;
 
     @Column
-    private String name;
+    private String firstName;
+
     @Column
     private String lastName;
+
     @Column
     private String profilePhoto;
+
     @Column
     private String biography;
+
     @Column
     private String motto;
 
-
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "user_id")
+    private User user;
 }

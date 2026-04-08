@@ -1,12 +1,11 @@
 package com.example.stakeholders_service.service;
 
-import com.example.stakeholders_service.repository.TouristRepository;
+import com.example.stakeholders_service.repository.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TouristService {
-
+public class ProfileService {
     @Autowired
-    private TouristRepository touristRepository;
+    private ProfileRepository profileRepository;
 }
