@@ -1,5 +1,6 @@
 package com.example.stakeholders_service.service;
 
+import com.example.stakeholders_service.dto.AccountDTO;
 import com.example.stakeholders_service.dto.RegistrationDTO;
 import com.example.stakeholders_service.model.Profile;
 import com.example.stakeholders_service.model.User;
@@ -9,7 +10,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -61,6 +64,18 @@ public class UserService {
 
     }
 
+    public List<User> findAll(){
+        return userRepository.findAll();
+    }
+
+
+    public User save(User user){
+        return userRepository.save(user);
+    }
+
+    public User findById(long id){
+        return userRepository.findById(id);
+    }
 
 
 }
