@@ -26,8 +26,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String username;
+
 
     @JsonIgnore
     @Column(nullable = false)
@@ -35,6 +34,9 @@ public class User implements UserDetails {
 
     @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false, unique = true)
+    private String username;
 
     @Column(nullable = false)
     private boolean enabled = true;
@@ -48,17 +50,33 @@ public class User implements UserDetails {
     private Timestamp lastPasswordResetDate;
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.getName()));
     }
 
     @Override
+    @JsonIgnore
     public @Nullable String getPassword() {
         return this.password;
     }
 
+
     @Override
-    public String getUsername() {
-        return this.email;
+    @JsonIgnore
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isAccountNonLocked() {
+        return UserDetails.super.isAccountNonLocked();
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
     }
 }
