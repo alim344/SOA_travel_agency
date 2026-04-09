@@ -29,7 +29,12 @@ async def add_comment(
     }
     result = await comments_collection.insert_one(doc)
     return {
-        "id": str(result.inserted_id), **doc,
+        "id": str(result.inserted_id),
+        "blog_id": blog_id,
+        "text": body.text,
+        "created_at": now,
+        "updated_at": now,
+        "author_email": user.email,
     }
 
 
