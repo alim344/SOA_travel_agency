@@ -4,6 +4,7 @@ import com.example.stakeholders_service.dto.AuthenticationRequestDTO;
 import com.example.stakeholders_service.dto.AuthenticationResponseDTO;
 import com.example.stakeholders_service.dto.RegistrationDTO;
 import com.example.stakeholders_service.model.User;
+import com.example.stakeholders_service.service.CustomUserDetailsService;
 import com.example.stakeholders_service.service.UserService;
 import com.example.stakeholders_service.util.TokenUtils;
 import org.apache.coyote.Response;
@@ -14,10 +15,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -32,6 +31,8 @@ public class AuthenticationController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody RegistrationDTO registrationDTO) {
@@ -69,6 +70,28 @@ public class AuthenticationController {
         return ResponseEntity.ok(new AuthenticationResponseDTO(jwt, expiresIn,role));
     }
 
+    @GetMapping("/userEnabled")
+    public ResponseEntity<?> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+
+
+        String email = tokenUtils.getEmailFromToken(token);
+        if (email == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+
+        if (!tokenUtils.validateToken(token, userDetails)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        User user = userService.findByEmail(email);
+        if(user == null || !user.isEnabled()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 
 
 
