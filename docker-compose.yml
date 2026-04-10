@@ -1,0 +1,55 @@
+services:
+
+  # ─── DATABASES ───────────────────────────────────────
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: stakeholders_db
+    environment:
+      POSTGRES_DB: stakeholders
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo:7
+    container_name: blog_db
+    environment:
+      MONGO_INITDB_DATABASE: blog
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # ─── SERVICES ────────────────────────────────────────
+
+  stakeholders_service:
+    build: ./stakeholders_service    # ← folder with its Dockerfile
+    container_name: stakeholders_service
+    ports:
+      - "9000:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/stakeholders
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - postgres
+
+  blogs_service:
+    build: ./blogs_service            # ← folder with its Dockerfile
+    container_name: blogs_service
+    ports:
+      - "9001:8001"
+    environment:
+      MONGO_URL: mongodb://mongo:27017/blog
+      STAKEHOLDERS_URL: http://stakeholders_service:8080   # ← for http calls
+    depends_on:
+      - mongo
+      - stakeholders_service
+
+volumes:
+  postgres_data:
+  mongo_data:
