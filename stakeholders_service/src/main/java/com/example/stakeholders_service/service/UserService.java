@@ -50,6 +50,8 @@ public class UserService {
             user.setRole(roleService.findByRoleName("ROLE_GUIDE"));
         } else if(dto.getRole().equalsIgnoreCase("ROLE_TOURIST")){
             user.setRole(roleService.findByRoleName("ROLE_TOURIST"));
+        }else if(dto.getRole().equalsIgnoreCase("ROLE_ADMIN")){
+            user.setRole(roleService.findByRoleName("ROLE_ADMIN"));
         }
 
         Profile profile = new Profile();

@@ -55,7 +55,9 @@ public class User implements UserDetails {
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.getName()));
+        //return List.of(new SimpleGrantedAuthority(role.getName()));
+        if (role == null) return List.of();
+        return List.of(role);
     }
 
     @Override
@@ -67,19 +69,25 @@ public class User implements UserDetails {
 
     @Override
     @JsonIgnore
+    public boolean isEnabled() {
+        return this.enabled;
+    }
+
+    @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return true;
     }
 
     @Override
     @JsonIgnore
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return true;
     }
 
     @Override
     @JsonIgnore
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+        return true;
     }
 }
