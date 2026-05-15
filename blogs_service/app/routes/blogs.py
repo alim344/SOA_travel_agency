@@ -1,8 +1,10 @@
+from xmlrpc import client
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from bson import ObjectId
 from datetime import datetime, timezone
-
-from app.database import blogs_collection
+import httpx
+from app.database import blogs_collection, FOLLOWER_SERVICE_URL
 from app.models import BlogCreate
 from app.auth import get_current_user, CurrentUser
 
@@ -43,8 +45,18 @@ async def create_blog(
 
 @router.get("/")
 async def get_blogs(user: CurrentUser = Depends(get_current_user)):
-    cursor = blogs_collection.find().sort("created_at", -1)
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{FOLLOWER_SERVICE_URL}/following/{user.user_id}")
+            following_ids = response.json() if response.status_code == 200 else []
+    except httpx.RequestError:
+        following_ids = []
+
+    following_ids.append(user.user_id)
+
+    cursor = blogs_collection.find({"author_id": {"$in": following_ids}}).sort("created_at", -1)
     blogs = await cursor.to_list(length=100)
+    
     return [blog_to_response(b, user.email) for b in blogs]
 
 
@@ -56,6 +68,14 @@ async def get_blog(
     doc = await blogs_collection.find_one({"_id": ObjectId(blog_id)})
     if not doc:
         raise HTTPException(status_code=404, detail="Blog not found")
+    
+    if doc["author_id"] == user.user_id:
+        return blog_to_response(doc, user.email)
+    
+    is_following = await check_if_following(user.user_id, doc["author_id"])
+    if not is_following:
+        raise HTTPException(status_code=403, detail="You must follow the author to view this blog")
+
     return blog_to_response(doc, user.email)
 
 
@@ -84,3 +104,19 @@ async def toggle_like(
             {"$addToSet": {"likes": user.email}},
         )
         return {"liked": True, "like_count": len(likes) + 1}
+    
+
+async def check_if_following(follower_id : str, followee_id : str) -> bool:
+    try:
+        async with httpx.AsyncClient() as client:
+            url = f"{FOLLOWER_SERVICE_URL}/is-following/{follower_id}/{followee_id}"
+            response = await client.get(url)
+            
+            if response.status_code == 200:
+                return response.json() 
+            return False
+    except httpx.RequestError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Follower service is temporarily unavailable"
+        )

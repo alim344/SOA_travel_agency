@@ -149,6 +149,35 @@ func (repo *FollowerRepository) GetFollowees(userID uuid.UUID) ([]uuid.UUID, err
 	return result.([]uuid.UUID), nil
 }
 
+func (repo *FollowerRepository) Is_Following(followerID, followeeID uuid.UUID) (bool, error) {
+	ctx := context.Background()
+	session := repo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	result, err := session.ExecuteRead(ctx, func(tx neo4j.ManagedTransaction) (any, error) {
+		query := `
+			match (follower:User {id: $followerID})-[:FOLLOWS]->(followee:User {id: $followeeID})
+			return count(*) > 0 as isFollowing
+		`
+		params := map[string]any{
+			"followerID": followerID.String(),
+			"followeeID": followeeID.String(),
+		}
+		res, err := tx.Run(ctx, query, params)
+		if err != nil {
+			return nil, err
+		}
+		if res.Next(ctx) {
+			return res.Record().Values[0].(bool), nil
+		}
+		return false, res.Err()
+	})
+	if err != nil {
+		return false, err
+	}
+	return result.(bool), nil
+}
+
 func (repo *FollowerRepository) GetRecommendations(userID uuid.UUID) ([]dto.RecommendationDTO, error) {
 	ctx := context.Background()
 	session := repo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})

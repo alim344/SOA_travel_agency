@@ -7,6 +7,7 @@ load_dotenv()
 MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017/blog")
 STAKEHOLDERS_URL = os.getenv("STAKEHOLDERS_URL", "http://localhost:8080")
 
+FOLLOWER_SERVICE_URL = os.getenv("FOLLOWER_SERVICE_URL", "http://localhost:8082")
 client = AsyncIOMotorClient(MONGO_URL)
 db = client.blog
 

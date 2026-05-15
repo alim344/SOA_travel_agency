@@ -85,6 +85,27 @@ func main() {
 		json.NewEncoder(w).Encode(followees)
 	}).Methods("GET")
 
+	router.HandleFunc("/is-following/{followerId}/{followeeId}", func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		userID1, err := uuid.Parse(vars["followerId"])
+		if err != nil {
+			http.Error(w, "Invalid user ID 1", http.StatusBadRequest)
+			return
+		}
+		userID2, err := uuid.Parse(vars["followeeId"])
+		if err != nil {
+			http.Error(w, "Invalid user ID 2", http.StatusBadRequest)
+			return
+		}
+		isFollowing, err := repo.Is_Following(userID1, userID2)
+		if err != nil {
+			logger.Printf("Failed to check following status: %v", err)
+			http.Error(w, "Failed to check following status", http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(isFollowing)
+	}).Methods("GET")
+
 	router.HandleFunc("/recommendations/{userID}", func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		userID, err := uuid.Parse(vars["userID"])
