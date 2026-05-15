@@ -18,14 +18,14 @@ public class Tour {
     private String name;
     private String description;
     private int difficulty;
-    private String tags; //hestegovi
+    private String tags;
 
     @Enumerated(EnumType.STRING)
     private TourStatus status = TourStatus.DRAFT;
     private double price = 0.0;
     private Long authorId;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<KeyPoint> keyPoints;
 
 
