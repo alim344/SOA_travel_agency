@@ -7,4 +7,8 @@ import java.util.List;
 
 public interface TourRepository extends JpaRepository<Tour, Long> {
     List<Tour>  findByAuthorId(Long id);
+
+
+    Tour getById(Long id);
+
 }
