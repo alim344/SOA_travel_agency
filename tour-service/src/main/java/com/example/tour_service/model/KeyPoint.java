@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -23,6 +25,8 @@ public class KeyPoint {
     private double latitude; // geografska sirina
     @Column
     private double longitude; // geografska duyina
-    @Column
-    private Long tourId;
+
+    @ManyToOne
+    @JoinColumn(name = "tour_id")
+    private Tour tour;
 }
