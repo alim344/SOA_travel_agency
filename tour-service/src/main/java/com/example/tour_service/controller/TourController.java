@@ -22,15 +22,19 @@ public class TourController {
     @Autowired
     private TourService tourService;
 
-
     @PostMapping
-    public ResponseEntity<String> createTour(@RequestBody TourDTO dto) {
-        tourService.createTour(dto);
+    public ResponseEntity<String> createTour(
+            @RequestBody TourDTO dto,
+            @RequestHeader(value = "X-User-ID", required = false) Long userIdFromHeader) {
+
+        Long authorId = userIdFromHeader != null ? userIdFromHeader : dto.getAuthorId();
+
+        tourService.createTour(dto, authorId);
         return ResponseEntity.ok("Successful!");
     }
 
     @GetMapping("/author/{authorId}")
-    public ResponseEntity<List<TourDTO>> getToursByAuthor(@PathVariable Long authorId) {
+    public ResponseEntity<List<TourDTO>> getToursByAuthor(@RequestHeader("X-User-ID") Long authorId) {
         List<TourDTO> response = tourService.getToursByAuthor(authorId);
         return ResponseEntity.ok(response);
     }

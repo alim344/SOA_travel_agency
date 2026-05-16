@@ -14,6 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 public class ReviewDTO {
     private Long id;
+    private String touristName;     
+    private String touristSurname;
     private int rating;
     private String comment;
     private Long touristId;

@@ -19,9 +19,10 @@ public class ReviewController {
     @PostMapping("/{tourId}")
     public ResponseEntity<ReviewDTO> addReview(
             @PathVariable Long tourId,
-            @RequestBody ReviewDTO request) {
+            @RequestBody ReviewDTO request,
+            @RequestHeader("X-User-ID") Long currentUserId) {
 
-        ReviewDTO response = reviewService.addReview(tourId, request);
+        ReviewDTO response = reviewService.addReview(tourId, request, currentUserId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

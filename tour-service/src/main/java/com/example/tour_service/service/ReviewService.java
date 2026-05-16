@@ -23,7 +23,7 @@ public class ReviewService {
     @Autowired
     private TourRepository tourRepository;
 
-    public ReviewDTO addReview(Long tourId, ReviewDTO request) {
+    public ReviewDTO addReview(Long tourId, ReviewDTO request, Long currentUserId) {
         Tour tour = tourRepository.findById(tourId)
                 .orElseThrow(() -> new RuntimeException("Tour not found with id: " + tourId));
 
@@ -34,7 +34,9 @@ public class ReviewService {
         Review review = new Review();
         review.setRating(request.getRating());
         review.setComment(request.getComment());
-        review.setTouristId(request.getTouristId());
+        review.setTouristId(currentUserId);
+        review.setTouristName(request.getTouristName());
+        review.setTouristSurname(request.getTouristSurname());
         review.setVisitDate(request.getVisitDate());
         review.setCommentDate(LocalDateTime.now());
         review.setImages(request.getImages() != null ? request.getImages() : new ArrayList<>());
@@ -55,6 +57,8 @@ public class ReviewService {
     private ReviewDTO mapToReviewResponseDTO(Review review) {
         ReviewDTO dto = new ReviewDTO();
         dto.setId(review.getId());
+        dto.setTouristName(review.getTouristName());
+        dto.setTouristSurname(review.getTouristSurname());
         dto.setRating(review.getRating());
         dto.setComment(review.getComment());
         dto.setTouristId(review.getTouristId());
