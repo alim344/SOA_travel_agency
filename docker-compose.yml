@@ -37,6 +37,19 @@ services:
       - neo4j_data:/data
       - neo4j_logs:/logs
 
+
+  tour-db:
+    image: postgres:15-alpine
+    container_name: tour_db
+    environment:
+      POSTGRES_DB: tourdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - tour_db_data:/var/lib/postgresql/data
+
   # ─── SERVICES ────────────────────────────────────────
 
   stakeholders-service:
@@ -80,8 +93,21 @@ services:
       - neo4j
       - stakeholders-service
 
+  tour-service:
+    build: ./tour-service
+    container_name: tour-service
+    ports:
+      - "9005:8085"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://tour-db:5432/tourdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - tour-db
+
 volumes:
   postgres_data:
   mongo_data:
   neo4j_data:
   neo4j_logs:
+  tour_db_data:
