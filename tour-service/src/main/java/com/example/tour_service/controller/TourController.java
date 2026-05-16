@@ -33,7 +33,7 @@ public class TourController {
         return ResponseEntity.ok("Successful!");
     }
 
-    @GetMapping("/author/{authorId}")
+    @GetMapping("/author")
     public ResponseEntity<List<TourDTO>> getToursByAuthor(@RequestHeader("X-User-ID") Long authorId) {
         List<TourDTO> response = tourService.getToursByAuthor(authorId);
         return ResponseEntity.ok(response);
