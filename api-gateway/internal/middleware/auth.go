@@ -18,9 +18,7 @@ func NewAuthMiddleware(authServiceURL string) *AuthMiddleware {
 	return &AuthMiddleware{authServiceURL: authServiceURL}
 }
 
-// ValidateToken checks the Bearer token by calling the stakeholders /validate endpoint.
-// If valid, it stores userID, username, and userRole in the Gin context
-// so downstream handlers (like ProxyToTours) can read them.
+// ValidateToken
 func (m *AuthMiddleware) ValidateToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
@@ -45,7 +43,6 @@ func (m *AuthMiddleware) ValidateToken() gin.HandlerFunc {
 		}
 
 		// Call stakeholders /auth/userEnabled to verify the token
-		// Spring controller uses @RequestMapping("/auth") so no /api prefix
 		validateURL := m.authServiceURL + "/auth/userEnabled"
 		log.Printf("[AuthMiddleware] Validating token at %s", validateURL)
 
@@ -75,8 +72,6 @@ func (m *AuthMiddleware) ValidateToken() gin.HandlerFunc {
 			return
 		}
 
-		// Parse the full User object returned by Spring's /auth/userEnabled
-		// Shape: { "id": 1, "email": "...", "username": "...", "enabled": true, "role": { "id": 2, "name": "TOURIST" } }
 		var parsed struct {
 			ID       int64  `json:"id"`
 			Email    string `json:"email"`
