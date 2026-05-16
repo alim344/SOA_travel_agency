@@ -1,7 +1,6 @@
 package dto
 
 type FollowRequestDTO struct {
-	FollowerID string `json:"follower_mail"`
 	FolloweeID string `json:"followee_mail"`
 }
 

@@ -49,6 +49,7 @@ async def get_blogs(user: CurrentUser = Depends(get_current_user)):
         async with httpx.AsyncClient() as client:
             response = await client.get(f"{FOLLOWER_SERVICE_URL}/following/{user.email}")
             following_list = response.json() if response.status_code == 200 else []
+            following_list = following_list or []
     except httpx.RequestError:
         following_list = []
 
@@ -61,10 +62,6 @@ async def get_blogs(user: CurrentUser = Depends(get_current_user)):
 
 @router.get("/all")
 async def get_all_blogs(user: CurrentUser = Depends(get_current_user)):
-    """
-    Vraća apsolutno sve blogove iz baze podataka bez ikakvog filtriranja.
-    Služi da proveriš da li se blog uopšte upisao u MongoDB.
-    """
     cursor = blogs_collection.find({}).sort("created_at", -1)
     blogs = await cursor.to_list(length=100)
     return [blog_to_response(b, user.email) for b in blogs]
@@ -98,17 +95,30 @@ async def toggle_like(
     if not doc:
         raise HTTPException(status_code=404, detail="Blog not found")
 
+    if doc["author_email"] != user.email:
+        try:
+            async with httpx.AsyncClient() as client:
+                url = f"{FOLLOWER_SERVICE_URL}/is-following/{user.email}/{doc['author_email']}"
+                response = await client.get(url)
+                is_following = (response.json() if response.status_code == 200 else False) or False
+        except httpx.RequestError:
+            raise HTTPException(status_code=503, detail="Follower service unavailable")
+        
+        if not is_following:
+            raise HTTPException(
+                status_code=403,
+                detail="You must follow the author to like their blog"
+            )
+
     likes: list = doc.get("likes", [])
 
     if user.email in likes:
-        #ukloni lajk
         await blogs_collection.update_one(
             {"_id": ObjectId(blog_id)},
             {"$pull": {"likes": user.email}},
         )
         return {"liked": False, "like_count": len(likes) - 1}
     else:
-        # dodaj lajk
         await blogs_collection.update_one(
             {"_id": ObjectId(blog_id)},
             {"$addToSet": {"likes": user.email}},
