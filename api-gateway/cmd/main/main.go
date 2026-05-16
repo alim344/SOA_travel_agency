@@ -126,12 +126,17 @@ func main() {
 
 	// TOUR SERVICE (Spring, port 8080)
 	// Tour routes — token required
+	javneTure := router.Group("/tour")
+	{
+		javneTure.GET("/getAllDtos", h.ProxyToTours)
+	}
+
 	tour := router.Group("/tour")
 	tour.Use(authMiddleware.ValidateToken())
 	{
 		tour.POST("", h.ProxyToTours)
 		tour.GET("/author/:authorId", h.ProxyToTours)
-		tour.GET("/getAllDtos", h.ProxyToTours)
+
 	}
 
 	// KeyPoint routes — token required

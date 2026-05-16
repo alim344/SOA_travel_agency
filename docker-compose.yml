@@ -55,8 +55,6 @@ services:
   stakeholders-service:
     build: ./stakeholders_service    # ← folder with its Dockerfile
     container_name: stakeholders-service
-    ports:
-      - "9000:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/stakeholders
       SPRING_DATASOURCE_USERNAME: postgres
@@ -67,8 +65,6 @@ services:
   blogs-service:
     build: ./blogs_service            # ← folder with its Dockerfile
     container_name: blogs-service
-    ports:
-      - "9001:8001"
     environment:
       MONGO_URL: mongodb://mongo:27017/blog
       STAKEHOLDERS_URL: http://stakeholders-service:8080   # ← for http calls
@@ -81,8 +77,6 @@ services:
   follower-service:
     build: ./follower_service
     container_name: follower-service
-    ports:
-      - "9002:8084"
     environment:
       - PORT=8084
       - NEO4J_DB=bolt://neo4j:7687
@@ -96,14 +90,29 @@ services:
   tour-service:
     build: ./tour-service
     container_name: tour-service
-    ports:
-      - "9005:8085"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://tour-db:5432/tourdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
     depends_on:
       - tour-db
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8000:8000"   
+    environment:
+      PORT: "8000"
+      STAKEHOLDERS_SERVICE_URL: http://stakeholders-service:8080
+      BLOG_SERVICE_URL: http://blogs-service:8001
+      TOUR_SERVICE_URL: http://tour-service:8085
+      FOLLOWER_SERVICE_URL: http://follower-service:8084
+    depends_on:
+      - stakeholders-service
+      - blogs-service
+      - follower-service
+      - tour-service
 
 volumes:
   postgres_data:
