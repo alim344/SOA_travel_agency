@@ -14,7 +14,7 @@ public class CorsRunner implements WebMvcConfigurer {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:8081");  // Frontend URL
+        configuration.addAllowedOrigin("http://localhost:5173");  // Frontend URL
         configuration.addAllowedMethod("GET");
         configuration.addAllowedMethod("POST");
         configuration.addAllowedMethod("PUT");

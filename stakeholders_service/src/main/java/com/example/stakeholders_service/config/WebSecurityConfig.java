@@ -61,6 +61,9 @@ public class WebSecurityConfig {
     @Autowired
     private TokenUtils tokenUtils;
 
+    @Autowired
+    private org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -68,10 +71,14 @@ public class WebSecurityConfig {
 
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(restAuthenticationEntryPoint));
 
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource));
+
+        http.csrf(csrf -> csrf.disable());
+
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()		// /auth/**
-                .requestMatchers("/h2-console/**").permitAll()	// /h2-console/** ako se koristi H2 baza)
-                .requestMatchers("/api/foo").permitAll()		// /api/foo
+                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/api/foo").permitAll()
                 .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(
                         "/favicon.ico",
@@ -81,22 +88,15 @@ public class WebSecurityConfig {
                         "/images/**",
                         "/static/**"
                 ).permitAll()
-
-
                 .anyRequest().authenticated()
         );
 
-        http.cors(cors -> cors.configure(http));
-
-        http.csrf(csrf -> csrf.disable());
-
-        http.addFilterBefore(new TokenAuthenticationFilter(tokenUtils,  userDetailsService()), BasicAuthenticationFilter.class);
+        http.addFilterBefore(new TokenAuthenticationFilter(tokenUtils, userDetailsService()), BasicAuthenticationFilter.class);
 
         http.authenticationProvider(authenticationProvider());
 
         return http.build();
     }
-
 
 
 
