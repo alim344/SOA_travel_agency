@@ -37,15 +37,22 @@ async def get_current_user(
                 detail="User not found or not enabled"
             )
         
-        # Success - get user data from response
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Auth failed with status {response.status_code}"
+            )
+        
         user_data = response.json()
         return CurrentUser(
             email=user_data["email"],
             enabled=user_data["enabled"]
         )
     
+    except HTTPException:
+        raise
     except httpx.RequestError:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Stakeholders service unavailable"
         )
