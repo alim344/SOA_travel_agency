@@ -25,6 +25,10 @@ public class Review {
 
     @Column
     private Long touristId;
+    @Column
+    private String touristName;
+    @Column
+    private String touristSurname;
 
     @Column
     private LocalDateTime visitDate;

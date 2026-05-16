@@ -26,7 +26,7 @@ public class TourService {
     private TourRepository tourRepository;
 
 
-    public Tour createTour(TourDTO dto) {
+    public Tour createTour(TourDTO dto, Long authorId) {
         Tour tour = new Tour();
         tour.setName(dto.getName());
         tour.setDescription(dto.getDescription());
@@ -35,7 +35,7 @@ public class TourService {
         String tagsString = String.join(",", dto.getTags());
         tour.setTags(tagsString);
 
-        tour.setAuthorId(dto.getAuthorId());
+        tour.setAuthorId(authorId);
         tour.setStatus(TourStatus.DRAFT);
         tour.setPrice(0.0);
 
