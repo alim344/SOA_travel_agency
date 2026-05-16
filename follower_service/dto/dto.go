@@ -1,13 +1,11 @@
 package dto
 
-import "github.com/google/uuid"
-
 type FollowRequestDTO struct {
-	FollowerID uuid.UUID `json:"follower_id"`
-	FolloweeID uuid.UUID `json:"followee_id"`
+	FollowerID string `json:"follower_mail"`
+	FolloweeID string `json:"followee_mail"`
 }
 
 type RecommendationDTO struct {
-	UserID uuid.UUID `json:"user_id"`
-	Score  int       `json:"score"`
+	UserID string `json:"user_mail"`
+	Score  int    `json:"score"`
 }

@@ -6,8 +6,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/google/uuid"
-
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
@@ -17,7 +15,7 @@ type FollowerRepository struct {
 }
 
 func New(logger *log.Logger) (*FollowerRepository, error) {
-	uri := os.Getenv("NEO4J_URI")
+	uri := os.Getenv("NEO4J_DB")
 	if uri == "" {
 		uri = "bolt://localhost:7687"
 	}
@@ -25,7 +23,7 @@ func New(logger *log.Logger) (*FollowerRepository, error) {
 	if username == "" {
 		username = "neo4j"
 	}
-	password := os.Getenv("NEO4J_PASSWORD")
+	password := os.Getenv("NEO4J_PASS")
 	if password == "" {
 		password = "password"
 	}
@@ -43,7 +41,7 @@ func New(logger *log.Logger) (*FollowerRepository, error) {
 	}, nil
 }
 
-func (repo *FollowerRepository) CreateFollow(followerID, followeeID uuid.UUID) error {
+func (repo *FollowerRepository) CreateFollow(followerID, followeeID string) error {
 	ctx := context.Background()
 	session := repo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
@@ -56,8 +54,8 @@ func (repo *FollowerRepository) CreateFollow(followerID, followeeID uuid.UUID) e
 			return follower
 		`
 		params := map[string]any{
-			"followerID": followerID.String(),
-			"followeeID": followeeID.String()}
+			"followerID": followerID,
+			"followeeID": followeeID}
 		res, err := tx.Run(ctx, query, params)
 		if err != nil {
 			return nil, err
@@ -67,7 +65,7 @@ func (repo *FollowerRepository) CreateFollow(followerID, followeeID uuid.UUID) e
 	return err
 }
 
-func (repo *FollowerRepository) DeleteFollow(followerID, followeeID uuid.UUID) error {
+func (repo *FollowerRepository) DeleteFollow(followerID, followeeID string) error {
 	ctx := context.Background()
 	session := repo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
@@ -79,8 +77,8 @@ func (repo *FollowerRepository) DeleteFollow(followerID, followeeID uuid.UUID) e
 			return follower
 		`
 		params := map[string]any{
-			"followerID": followerID.String(),
-			"followeeID": followeeID.String()}
+			"followerID": followerID,
+			"followeeID": followeeID}
 		res, err := tx.Run(ctx, query, params)
 
 		if err != nil {
@@ -91,7 +89,7 @@ func (repo *FollowerRepository) DeleteFollow(followerID, followeeID uuid.UUID) e
 	return err
 }
 
-func (repo *FollowerRepository) GetFollowers(userID uuid.UUID) ([]uuid.UUID, error) {
+func (repo *FollowerRepository) GetFollowers(userID string) ([]string, error) {
 	ctx := context.Background()
 	session := repo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
@@ -101,26 +99,25 @@ func (repo *FollowerRepository) GetFollowers(userID uuid.UUID) ([]uuid.UUID, err
 			match (follower:User)-[:FOLLOWS]->(followee:User {id: $userID})
 			return follower.id as id
 		`
-		params := map[string]any{"userID": userID.String()}
+		params := map[string]any{"userID": userID}
 		res, err := tx.Run(ctx, query, params)
 		if err != nil {
 			return nil, err
 		}
-		var followers []uuid.UUID
+		var followers []string
 		for res.Next(ctx) {
 			idStr, _ := res.Record().Values[0].(string)
-			id, _ := uuid.Parse(idStr)
-			followers = append(followers, id)
+			followers = append(followers, idStr)
 		}
 		return followers, nil
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.([]uuid.UUID), nil
+	return result.([]string), nil
 }
 
-func (repo *FollowerRepository) GetFollowees(userID uuid.UUID) ([]uuid.UUID, error) {
+func (repo *FollowerRepository) GetFollowees(userID string) ([]string, error) {
 	ctx := context.Background()
 	session := repo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
@@ -130,26 +127,25 @@ func (repo *FollowerRepository) GetFollowees(userID uuid.UUID) ([]uuid.UUID, err
 			match (follower:User {id: $userID})-[:FOLLOWS]->(followee:User)
 			return followee.id as id
 		`
-		params := map[string]any{"userID": userID.String()}
+		params := map[string]any{"userID": userID}
 		res, err := tx.Run(ctx, query, params)
 		if err != nil {
 			return nil, err
 		}
-		var followees []uuid.UUID
+		var followees []string
 		for res.Next(ctx) {
 			idStr, _ := res.Record().Values[0].(string)
-			id, _ := uuid.Parse(idStr)
-			followees = append(followees, id)
+			followees = append(followees, idStr)
 		}
 		return followees, nil
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.([]uuid.UUID), nil
+	return result.([]string), nil
 }
 
-func (repo *FollowerRepository) Is_Following(followerID, followeeID uuid.UUID) (bool, error) {
+func (repo *FollowerRepository) Is_Following(followerID, followeeID string) (bool, error) {
 	ctx := context.Background()
 	session := repo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
@@ -160,8 +156,8 @@ func (repo *FollowerRepository) Is_Following(followerID, followeeID uuid.UUID) (
 			return count(*) > 0 as isFollowing
 		`
 		params := map[string]any{
-			"followerID": followerID.String(),
-			"followeeID": followeeID.String(),
+			"followerID": followerID,
+			"followeeID": followeeID,
 		}
 		res, err := tx.Run(ctx, query, params)
 		if err != nil {
@@ -178,7 +174,7 @@ func (repo *FollowerRepository) Is_Following(followerID, followeeID uuid.UUID) (
 	return result.(bool), nil
 }
 
-func (repo *FollowerRepository) GetRecommendations(userID uuid.UUID) ([]dto.RecommendationDTO, error) {
+func (repo *FollowerRepository) GetRecommendations(userID string) ([]dto.RecommendationDTO, error) {
 	ctx := context.Background()
 	session := repo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
@@ -191,7 +187,7 @@ func (repo *FollowerRepository) GetRecommendations(userID uuid.UUID) ([]dto.Reco
 			order by score desc
 			limit 10
 		`
-		res, err := tx.Run(ctx, query, map[string]any{"userID": userID.String()})
+		res, err := tx.Run(ctx, query, map[string]any{"userID": userID})
 		if err != nil {
 			return nil, err
 
@@ -199,7 +195,7 @@ func (repo *FollowerRepository) GetRecommendations(userID uuid.UUID) ([]dto.Reco
 		var recommendations []dto.RecommendationDTO
 		for res.Next(ctx) {
 			rec := res.Record()
-			idStr, _ := uuid.Parse(rec.Values[0].(string))
+			idStr := rec.Values[0].(string)
 			score := int(rec.Values[1].(int64))
 			recommendations = append(recommendations, dto.RecommendationDTO{UserID: idStr, Score: score})
 		}

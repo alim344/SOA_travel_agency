@@ -75,3 +75,69 @@ async def update_comment(
         {"$set": {"text": body.text, "updated_at": datetime.now(timezone.utc)}},
     )
     return {"message": "Comment updated successfully"}
+
+@router.put("/{blog_id}/comments/{comment_id}")
+async def update_comment(
+    blog_id: str,
+    comment_id: str,
+    body: CommentCreate,
+    user: CurrentUser = Depends(get_current_user),
+):
+    blog = await blogs_collection.find_one({"_id": ObjectId(blog_id)})
+    if not blog:
+        raise HTTPException(status_code=404, detail="Blog not found")
+
+    comment = await comments_collection.find_one({"_id": ObjectId(comment_id)})
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+    
+    if comment.get("author_email") != user.email:
+        raise HTTPException(
+            status_code=403, 
+            detail="You do not have permission to update this comment"
+        )
+    
+    now = datetime.now(timezone.utc)
+    
+    await comments_collection.update_one(
+        {"_id": ObjectId(comment_id)},
+        {
+            "$set": {
+                "text": body.text,
+                "updated_at": now
+            }
+        }
+    )
+    
+    return {
+        "id": comment_id,
+        "blog_id": blog_id,
+        "text": body.text,
+        "created_at": comment["created_at"],
+        "updated_at": now,
+        "author_email": user.email,
+    }
+
+
+@router.delete("/{blog_id}/comments/{comment_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_comment(
+    blog_id: str,
+    comment_id: str,
+    user: CurrentUser = Depends(get_current_user),
+):
+    blog = await blogs_collection.find_one({"_id": ObjectId(blog_id)})
+    if not blog:
+        raise HTTPException(status_code=404, detail="Blog not found")
+
+    comment = await comments_collection.find_one({"_id": ObjectId(comment_id)})
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+    
+    if comment.get("author_email") != user.email:
+        raise HTTPException(
+            status_code=403, 
+            detail="You do not have permission to delete this comment"
+        )
+    
+    await comments_collection.delete_one({"_id": ObjectId(comment_id)})
+    return None

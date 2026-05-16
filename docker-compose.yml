@@ -24,6 +24,19 @@ services:
     volumes:
       - mongo_data:/data/db
 
+  neo4j:
+    image: neo4j:5.23
+    container_name: followers_db
+    ports:
+      - "7687:7687"  
+      - "7474:7474"  # browser
+    environment:
+      - NEO4J_AUTH=neo4j/password123
+      - NEO4J_dbms_default__listen__address=0.0.0.0
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+
   # ─── SERVICES ────────────────────────────────────────
 
   stakeholders-service:
@@ -46,10 +59,29 @@ services:
     environment:
       MONGO_URL: mongodb://mongo:27017/blog
       STAKEHOLDERS_URL: http://stakeholders-service:8080   # ← for http calls
+      FOLLOWER_SERVICE_URL: http://follower-service:8084
     depends_on:
       - mongo
+      - stakeholders-service
+      - follower-service
+
+  follower-service:
+    build: ./follower_service
+    container_name: follower-service
+    ports:
+      - "9002:8084"
+    environment:
+      - PORT=8084
+      - NEO4J_DB=bolt://neo4j:7687
+      - NEO4J_USERNAME=neo4j
+      - NEO4J_PASS=password123
+      - STAKEHOLDERS_URL=http://stakeholders-service:8080
+    depends_on:
+      - neo4j
       - stakeholders-service
 
 volumes:
   postgres_data:
   mongo_data:
+  neo4j_data:
+  neo4j_logs:

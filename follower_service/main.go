@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -52,10 +51,10 @@ func main() {
 		w.WriteHeader(http.StatusCreated)
 	}).Methods("POST")
 
-	router.HandleFunc("/followers/{userID}", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/followers/{mail}", func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		userID, err := uuid.Parse(vars["userID"])
-		if err != nil {
+		userID := vars["mail"]
+		if userID == "" {
 			http.Error(w, "Invalid user ID", http.StatusBadRequest)
 			return
 		}
@@ -69,10 +68,10 @@ func main() {
 		json.NewEncoder(w).Encode(followers)
 	}).Methods("GET")
 
-	router.HandleFunc("/followees/{userID}", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/followees/{mail}", func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		userID, err := uuid.Parse(vars["userID"])
-		if err != nil {
+		userID := vars["mail"]
+		if userID == "" {
 			http.Error(w, "Invalid user ID", http.StatusBadRequest)
 			return
 		}
@@ -87,17 +86,17 @@ func main() {
 
 	router.HandleFunc("/is-following/{followerId}/{followeeId}", func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		userID1, err := uuid.Parse(vars["followerId"])
-		if err != nil {
-			http.Error(w, "Invalid user ID 1", http.StatusBadRequest)
+		followerID := vars["followerId"]
+		if followerID == "" {
+			http.Error(w, "Invalid follower ID", http.StatusBadRequest)
 			return
 		}
-		userID2, err := uuid.Parse(vars["followeeId"])
-		if err != nil {
-			http.Error(w, "Invalid user ID 2", http.StatusBadRequest)
+		followeeID := vars["followeeId"]
+		if followeeID == "" {
+			http.Error(w, "Invalid followee ID", http.StatusBadRequest)
 			return
 		}
-		isFollowing, err := repo.Is_Following(userID1, userID2)
+		isFollowing, err := repo.Is_Following(followerID, followeeID)
 		if err != nil {
 			logger.Printf("Failed to check following status: %v", err)
 			http.Error(w, "Failed to check following status", http.StatusInternalServerError)
@@ -106,10 +105,10 @@ func main() {
 		json.NewEncoder(w).Encode(isFollowing)
 	}).Methods("GET")
 
-	router.HandleFunc("/recommendations/{userID}", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/recommendations/{mail}", func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		userID, err := uuid.Parse(vars["userID"])
-		if err != nil {
+		userID := vars["mail"]
+		if userID == "" {
 			http.Error(w, "Invalid user ID", http.StatusBadRequest)
 			return
 		}
@@ -123,6 +122,6 @@ func main() {
 		json.NewEncoder(w).Encode(recs)
 	}).Methods("GET")
 
-	logger.Println("Follower service is running on port 8080")
-	logger.Fatal(http.ListenAndServe(":8080", router))
+	logger.Println("Follower service is running on port 8084")
+	logger.Fatal(http.ListenAndServe(":8084", router))
 }
