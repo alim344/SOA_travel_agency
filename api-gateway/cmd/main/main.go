@@ -136,6 +136,9 @@ func main() {
 	{
 		tour.POST("", h.ProxyToTours)
 		tour.GET("/author/:authorId", h.ProxyToTours)
+		tour.GET("/author", h.ProxyToTours)
+		tour.GET("/:id", h.ProxyToTours)
+		tour.PUT("/:id/publish", h.ProxyToTours)
 
 	}
 

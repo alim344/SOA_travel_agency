@@ -39,11 +39,22 @@ public class TourController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<TourDTO> getTourById(@PathVariable Long id) {
+        TourDTO response = tourService.getTourById(id);
+        return ResponseEntity.ok(response);
+    }
 
     @GetMapping("/getAllDtos")
     public ResponseEntity<List<TourPointDTO>> getAllTours(){
         List<TourPointDTO> dtos = tourService.getTourPointDTOS();
         return ResponseEntity.ok().body(dtos);
+    }
+
+    @PutMapping("/{id}/publish")
+    public ResponseEntity<TourDTO> publishTour(@PathVariable Long id) {
+        TourDTO response = tourService.publishTour(id);
+        return ResponseEntity.ok(response);
     }
 
 
