@@ -114,7 +114,14 @@ func (repo *FollowerRepository) GetFollowers(userID string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	return result.([]string), nil
+	if result == nil {
+		return []string{}, nil
+	}
+	followers, ok := result.([]string)
+	if !ok {
+		return []string{}, nil
+	}
+	return followers, nil
 }
 
 func (repo *FollowerRepository) GetFollowees(userID string) ([]string, error) {
@@ -142,7 +149,14 @@ func (repo *FollowerRepository) GetFollowees(userID string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	return result.([]string), nil
+	if result == nil {
+		return []string{}, nil
+	}
+	followees, ok := result.([]string)
+	if !ok {
+		return []string{}, nil
+	}
+	return followees, nil
 }
 
 func (repo *FollowerRepository) Is_Following(followerID, followeeID string) (bool, error) {
@@ -204,5 +218,12 @@ func (repo *FollowerRepository) GetRecommendations(userID string) ([]dto.Recomme
 	if err != nil {
 		return nil, err
 	}
-	return result.([]dto.RecommendationDTO), nil
+	if result == nil {
+		return []dto.RecommendationDTO{}, nil
+	}
+	recs, ok := result.([]dto.RecommendationDTO)
+	if !ok {
+		return []dto.RecommendationDTO{}, nil
+	}
+	return recs, nil
 }

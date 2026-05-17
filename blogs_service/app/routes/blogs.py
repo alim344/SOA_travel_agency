@@ -48,8 +48,7 @@ async def get_blogs(user: CurrentUser = Depends(get_current_user)):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(f"{FOLLOWER_SERVICE_URL}/following/{user.email}")
-            following_list = response.json() if response.status_code == 200 else []
-            following_list = following_list or []
+            following_list = (response.json() if response.status_code == 200 else None) or []
     except httpx.RequestError:
         following_list = []
 
