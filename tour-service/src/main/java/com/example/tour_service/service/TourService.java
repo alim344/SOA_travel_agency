@@ -96,6 +96,12 @@ public class TourService {
         return tourRepository.getById(id);
     }
 
-
+    public List<TourDTO> GetNoDraftTours(Long authorId) {
+        List<Tour> tours = tourRepository.findByAuthorId(authorId);
+        return tours.stream()
+                .filter(tour -> tour.getStatus() != TourStatus.DRAFT)
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
 
 }

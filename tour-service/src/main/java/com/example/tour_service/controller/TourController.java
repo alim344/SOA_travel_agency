@@ -40,6 +40,12 @@ public class TourController {
     }
 
 
+    @GetMapping("/nodraft/guide/{authorId}")
+    public ResponseEntity<List<TourDTO>> getGuideNoDraftTours(@PathVariable Long authorId) {
+        List<TourDTO> response = tourService.GetNoDraftTours(authorId);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/getAllDtos")
     public ResponseEntity<List<TourPointDTO>> getAllTours(){
         List<TourPointDTO> dtos = tourService.getTourPointDTOS();
