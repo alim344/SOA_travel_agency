@@ -49,6 +49,24 @@ public class TourService {
                 .collect(Collectors.toList());
     }
 
+    public TourDTO getTourById(Long id) {
+        Tour tour = tourRepository.getById(id);
+        return mapToResponseDTO(tour);
+    }
+
+    public TourDTO publishTour(Long id) {
+        Tour tour = tourRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tour not found"));
+
+        if (tour.getKeyPoints() == null || tour.getKeyPoints().size() < 2) {
+            throw new RuntimeException("Tour must have at least 2 key points to publish");
+        }
+
+        tour.setStatus(TourStatus.PUBLISHED);
+        Tour savedTour = tourRepository.save(tour);
+        return mapToResponseDTO(savedTour);
+    }
+
     private TourDTO mapToResponseDTO(Tour tour) {
         TourDTO dto = new TourDTO();
         dto.setId(tour.getId());
