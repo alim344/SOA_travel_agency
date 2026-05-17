@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -42,7 +43,8 @@ func (h *GatewayHandler) ProxyToBlog(c *gin.Context) {
 
 // ─── FOLLOWER ─────────────────────────────────────────────────────────────────
 func (h *GatewayHandler) ProxyToFollower(c *gin.Context) {
-	targetURL := h.followerServiceURL + c.Request.URL.Path
+	path := strings.TrimPrefix(c.Request.URL.Path, "/follower")
+	targetURL := h.followerServiceURL + path
 	log.Printf("[Follower] %s %s", c.Request.Method, targetURL)
 	h.proxyRequest(c, targetURL)
 }

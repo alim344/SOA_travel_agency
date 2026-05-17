@@ -188,11 +188,10 @@ func main() {
 		json.NewEncoder(w).Encode(isFollowing)
 	}).Methods("GET")
 
-	router.HandleFunc("/recommendations/{mail}", func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		userID := vars["mail"]
-		if userID == "" {
-			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+	router.HandleFunc("/recommendations", func(w http.ResponseWriter, r *http.Request) {
+		userID, err := getEmailFromToken(r)
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 		recs, err := repo.GetRecommendations(userID)
@@ -204,6 +203,7 @@ func main() {
 		if recs == nil {
 			recs = []dto.RecommendationDTO{}
 		}
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(recs)
 	}).Methods("GET")
 

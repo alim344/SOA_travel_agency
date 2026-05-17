@@ -112,7 +112,7 @@ func main() {
 
 	// FOLLOWER SERVICE ( port 8084)
 	// Token required — follower service reads email from JWT itself,
-	follower := router.Group("")
+	follower := router.Group("/follower")
 	follower.Use(authMiddleware.ValidateToken())
 	{
 		follower.POST("/follow", h.ProxyToFollower)
@@ -121,7 +121,7 @@ func main() {
 		follower.GET("/followees/:mail", h.ProxyToFollower)
 		follower.GET("/following/:mail", h.ProxyToFollower)
 		follower.GET("/is-following/:followerId/:followeeId", h.ProxyToFollower)
-		follower.GET("/recommendations/:mail", h.ProxyToFollower)
+		follower.GET("/recommendations", h.ProxyToFollower)
 	}
 
 	// TOUR SERVICE (Spring, port 8080)
