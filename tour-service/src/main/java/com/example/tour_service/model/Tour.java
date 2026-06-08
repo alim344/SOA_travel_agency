@@ -4,6 +4,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.MapKeyEnumerated;
+
 import java.util.List;
 
 @Getter
@@ -24,6 +30,8 @@ public class Tour {
     private String tags;
     @Column
     private double totalDistance;
+    @Column
+    private LocalDateTime publishedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -35,6 +43,10 @@ public class Tour {
 
     @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<KeyPoint> keyPoints;
+
+    @ElementCollection
+    @MapKeyEnumerated(EnumType.STRING)
+    private Map<TransportType, Integer> durationByTransport = new HashMap<>();
 
 
 }

@@ -6,17 +6,15 @@ import com.example.tour_service.model.Tour;
 import com.example.tour_service.model.TourStatus;
 
 import com.example.tour_service.DTO.TourPointDTO;
+import com.example.tour_service.model.TransportType;
 import com.example.tour_service.repo.TourRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import java.util.ArrayList;
 
 
 @Service
@@ -59,10 +57,16 @@ public class TourService {
                 .orElseThrow(() -> new RuntimeException("Tour not found"));
 
         if (tour.getKeyPoints() == null || tour.getKeyPoints().size() < 2) {
-            throw new RuntimeException("Tour must have at least 2 key points to publish");
+            throw new RuntimeException("Tour must have at least 2 key points");
+        }
+
+        if (tour.getDurationByTransport() == null || tour.getDurationByTransport().isEmpty()) {
+            throw new RuntimeException("Tour must have at least one transport duration defined");
         }
 
         tour.setStatus(TourStatus.PUBLISHED);
+        tour.setPublishedAt(LocalDateTime.now());
+
         Tour savedTour = tourRepository.save(tour);
         return mapToResponseDTO(savedTour);
     }
@@ -77,6 +81,15 @@ public class TourService {
         dto.setPrice(tour.getPrice());
         dto.setAuthorId(tour.getAuthorId());
         dto.setTotalDistance(tour.getTotalDistance());
+        dto.setPublishedAt(tour.getPublishedAt());
+
+        if (tour.getDurationByTransport() != null) {
+            Map<String, Integer> durationMap = new HashMap<>();
+            tour.getDurationByTransport().forEach((key, value) ->
+                    durationMap.put(key.name(), value)
+            );
+            dto.setDurationByTransport(durationMap);
+        }
 
         if (tour.getTags() != null && !tour.getTags().isEmpty()) {
             dto.setTags(Arrays.asList(tour.getTags().split(",")));
@@ -125,6 +138,16 @@ public class TourService {
 
     public Tour updateTour(Tour tour) {
         return tourRepository.save(tour);
+    }
+
+    public TourDTO addDuration(Long tourId, TransportType transportType, int minutes) {
+        Tour tour = tourRepository.findById(tourId)
+                .orElseThrow(() -> new RuntimeException("Tour not found"));
+
+        tour.getDurationByTransport().put(transportType, minutes);
+        Tour savedTour = tourRepository.save(tour);
+
+        return mapToResponseDTO(savedTour);
     }
 
 }

@@ -140,6 +140,7 @@ func main() {
 		tour.GET("/author", h.ProxyToTours)
 		tour.GET("/:id", h.ProxyToTours)
 		tour.PUT("/:id/publish", h.ProxyToTours)
+		tour.POST("/:id/duration", h.ProxyToTours)
 	}
 
 	// KeyPoint routes — token required

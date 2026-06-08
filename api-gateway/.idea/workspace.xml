@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="75f8989c-b0e5-47ae-ae34-050b93190852" name="Changes" comment="" />
+    <list default="true" id="75f8989c-b0e5-47ae-ae34-050b93190852" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/DTO/DurationRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/model/TransportType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/main/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/DTO/TourDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/DTO/TourDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/controller/TourController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/controller/TourController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/model/Tour.java" beforeDir="false" afterPath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/model/Tour.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/service/TourService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/service/TourService.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -19,19 +28,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Tanja/Documents/GitHub/SOA_travel_agency/api-gateway&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "tour-archived",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/Tanja/Documents/GitHub/SOA_travel_agency/api-gateway",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="api-gateway" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="api-gateway" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="75f8989c-b0e5-47ae-ae34-050b93190852" name="Changes" comment="" />
@@ -42,6 +64,7 @@
       <workItem from="1779109274400" duration="8851000" />
       <workItem from="1779176538919" duration="5151000" />
       <workItem from="1779228527572" duration="20000" />
+      <workItem from="1780938583637" duration="404000" />
     </task>
     <servers />
   </component>

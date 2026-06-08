@@ -1,5 +1,6 @@
 package com.example.tour_service.controller;
 
+import com.example.tour_service.DTO.DurationRequest;
 import com.example.tour_service.DTO.TourDTO;
 import com.example.tour_service.service.TourService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,15 @@ public class TourController {
     @PutMapping("/{id}/publish")
     public ResponseEntity<TourDTO> publishTour(@PathVariable Long id) {
         TourDTO response = tourService.publishTour(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/duration")
+    public ResponseEntity<TourDTO> addDuration(
+            @PathVariable Long id,
+            @RequestBody DurationRequest request) {
+
+        TourDTO response = tourService.addDuration(id, request.getTransportType(), request.getMinutes());
         return ResponseEntity.ok(response);
     }
 
