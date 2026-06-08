@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/tour")
 public class TourController {
@@ -62,7 +60,5 @@ public class TourController {
         TourDTO response = tourService.publishTour(id);
         return ResponseEntity.ok(response);
     }
-
-
 
 }

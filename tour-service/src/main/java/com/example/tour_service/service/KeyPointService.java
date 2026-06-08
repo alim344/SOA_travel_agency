@@ -20,9 +20,10 @@ public class KeyPointService {
     private KeyPointRepository keyPointRepository;
 
     @Autowired
+    private DistanceCalculator distanceCalculator;
+
+    @Autowired
     private TourService tourService;
-
-
 
     public  List<PointDTO> GetByTourId(Long id){
         List<PointDTO> dtos = new ArrayList<>();
@@ -66,6 +67,9 @@ public class KeyPointService {
         keyPoint.setImagePath(dto.getImagePath());
         keyPoint.setTour(tour);
         keyPointRepository.save(keyPoint);
+
+        updateTourTotalDistance(tour);
+
         return true;
     }
 
@@ -79,7 +83,15 @@ public class KeyPointService {
             return false;
         }
 
+        KeyPoint keyPoint = keyPointRepository.findById(id).get();
+        Tour tour = keyPoint.getTour();
+
         keyPointRepository.deleteById(id);
+
+        if (tour != null) {
+            updateTourTotalDistance(tour);
+        }
+
         return true;
     }
 
@@ -89,6 +101,8 @@ public class KeyPointService {
     public PointDTO updateKeyPoint( PointDTO dto) {
 
         KeyPoint point = keyPointRepository.findById(dto.getId()).get();
+        Tour tour = point.getTour();
+
         point.setDescription(dto.getDescription());
         point.setLatitude(dto.getLatitude());
         point.setLongitude(dto.getLongitude());
@@ -96,8 +110,20 @@ public class KeyPointService {
         point.setImagePath(dto.getImagePath());
 
         KeyPoint updatePoint = keyPointRepository.save(point);
+
+        if (tour != null) {
+            updateTourTotalDistance(tour);
+        }
+
         return getPointDTO(updatePoint);
 
+    }
+
+    private void updateTourTotalDistance(Tour tour) {
+        List<KeyPoint> keyPoints = keyPointRepository.findKeyPointByTourId(tour.getId());
+        double totalDistance = distanceCalculator.calculateTotalDistance(keyPoints);
+        tour.setTotalDistance(totalDistance);
+        tourService.updateTour(tour);
     }
 
 }

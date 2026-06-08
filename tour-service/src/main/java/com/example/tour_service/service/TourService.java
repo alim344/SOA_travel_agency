@@ -76,6 +76,7 @@ public class TourService {
         dto.setStatus(tour.getStatus());
         dto.setPrice(tour.getPrice());
         dto.setAuthorId(tour.getAuthorId());
+        dto.setTotalDistance(tour.getTotalDistance());
 
         if (tour.getTags() != null && !tour.getTags().isEmpty()) {
             dto.setTags(Arrays.asList(tour.getTags().split(",")));
@@ -120,6 +121,10 @@ public class TourService {
                 .filter(tour -> tour.getStatus() != TourStatus.DRAFT)
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Tour updateTour(Tour tour) {
+        return tourRepository.save(tour);
     }
 
 }

@@ -22,6 +22,8 @@ public class Tour {
     private int difficulty;
     @Column
     private String tags;
+    @Column
+    private double totalDistance;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

@@ -21,4 +21,5 @@ public class TourDTO {
     private TourStatus status;
     private Double price;
     private Long authorId;
+    private double totalDistance;
 }
