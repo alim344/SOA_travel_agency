@@ -80,7 +80,7 @@ func (h *GatewayHandler) proxyRequest(c *gin.Context, targetURL string) {
 		return
 	}
 
-	// Forward all headers (Authorization, Content-Type, etc.)
+	// Forward all headers (Authorization,..)
 	for key, values := range c.Request.Header {
 		for _, val := range values {
 			req.Header.Add(key, val)
