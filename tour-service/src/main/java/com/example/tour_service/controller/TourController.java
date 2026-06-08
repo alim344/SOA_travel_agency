@@ -1,5 +1,6 @@
 package com.example.tour_service.controller;
 
+import com.example.tour_service.DTO.DurationRequest;
 import com.example.tour_service.DTO.TourDTO;
 import com.example.tour_service.service.TourService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,6 @@ import com.example.tour_service.DTO.TourPointDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/tour")
@@ -57,12 +56,37 @@ public class TourController {
         return ResponseEntity.ok().body(dtos);
     }
 
+    @GetMapping("/getAllActiveTours")
+    public ResponseEntity<List<TourPointDTO>> getAllActiveTours(){
+        List<TourPointDTO> dtos = tourService.getActiveTourPointDTOS();
+        return ResponseEntity.ok().body(dtos);
+    }
+
     @PutMapping("/{id}/publish")
     public ResponseEntity<TourDTO> publishTour(@PathVariable Long id) {
         TourDTO response = tourService.publishTour(id);
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/{id}/duration")
+    public ResponseEntity<TourDTO> addDuration(
+            @PathVariable Long id,
+            @RequestBody DurationRequest request) {
 
+        TourDTO response = tourService.addDuration(id, request.getTransportType(), request.getMinutes());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/archive")
+    public ResponseEntity<TourDTO> archiveTour(@PathVariable Long id) {
+        TourDTO response = tourService.archiveTour(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/reactivate")
+    public ResponseEntity<TourDTO> reactivateTour(@PathVariable Long id) {
+        TourDTO response = tourService.reactivateTour(id);
+        return ResponseEntity.ok(response);
+    }
 
 }

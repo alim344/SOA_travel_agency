@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="75f8989c-b0e5-47ae-ae34-050b93190852" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/DTO/DurationRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/model/TransportType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/main/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/DTO/TourDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/DTO/TourDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/controller/TourController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/controller/TourController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/model/Tour.java" beforeDir="false" afterPath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/model/Tour.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/service/TourService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../tour-service/src/main/java/com/example/tour_service/service/TourService.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3DtlVapjTjwK8AExIakWqF9yKYP" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "tour-archived",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/Tanja/Documents/GitHub/SOA_travel_agency/api-gateway",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="api-gateway" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="api-gateway" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="75f8989c-b0e5-47ae-ae34-050b93190852" name="Changes" comment="" />
+      <created>1779109272698</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1779109272698</updated>
+      <workItem from="1779109274400" duration="8851000" />
+      <workItem from="1779176538919" duration="5151000" />
+      <workItem from="1779228527572" duration="20000" />
+      <workItem from="1780938583637" duration="404000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

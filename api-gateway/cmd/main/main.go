@@ -129,6 +129,7 @@ func main() {
 	javneTure := router.Group("/tour")
 	{
 		javneTure.GET("/getAllDtos", h.ProxyToTours)
+		javneTure.GET("/getAllActiveTours", h.ProxyToTours)
 	}
 
 	tour := router.Group("/tour")
@@ -140,6 +141,9 @@ func main() {
 		tour.GET("/author", h.ProxyToTours)
 		tour.GET("/:id", h.ProxyToTours)
 		tour.PUT("/:id/publish", h.ProxyToTours)
+		tour.POST("/:id/duration", h.ProxyToTours)
+		tour.POST("/:id/archive", h.ProxyToTours)
+        tour.POST("/:id/reactivate", h.ProxyToTours)
 	}
 
 	// KeyPoint routes — token required

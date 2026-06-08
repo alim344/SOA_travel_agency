@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -21,4 +23,8 @@ public class TourDTO {
     private TourStatus status;
     private Double price;
     private Long authorId;
+    private double totalDistance;
+    private Map<String, Integer> durationByTransport;
+    private LocalDateTime publishedAt;
+    private LocalDateTime archivedAt;
 }

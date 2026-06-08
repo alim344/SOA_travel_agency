@@ -6,17 +6,15 @@ import com.example.tour_service.model.Tour;
 import com.example.tour_service.model.TourStatus;
 
 import com.example.tour_service.DTO.TourPointDTO;
+import com.example.tour_service.model.TransportType;
 import com.example.tour_service.repo.TourRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import java.util.ArrayList;
 
 
 @Service
@@ -59,10 +57,16 @@ public class TourService {
                 .orElseThrow(() -> new RuntimeException("Tour not found"));
 
         if (tour.getKeyPoints() == null || tour.getKeyPoints().size() < 2) {
-            throw new RuntimeException("Tour must have at least 2 key points to publish");
+            throw new RuntimeException("Tour must have at least 2 key points");
+        }
+
+        if (tour.getDurationByTransport() == null || tour.getDurationByTransport().isEmpty()) {
+            throw new RuntimeException("Tour must have at least one transport duration defined");
         }
 
         tour.setStatus(TourStatus.PUBLISHED);
+        tour.setPublishedAt(LocalDateTime.now());
+
         Tour savedTour = tourRepository.save(tour);
         return mapToResponseDTO(savedTour);
     }
@@ -76,6 +80,17 @@ public class TourService {
         dto.setStatus(tour.getStatus());
         dto.setPrice(tour.getPrice());
         dto.setAuthorId(tour.getAuthorId());
+        dto.setTotalDistance(tour.getTotalDistance());
+        dto.setPublishedAt(tour.getPublishedAt());
+        dto.setArchivedAt(tour.getArchivedAt());
+
+        if (tour.getDurationByTransport() != null) {
+            Map<String, Integer> durationMap = new HashMap<>();
+            tour.getDurationByTransport().forEach((key, value) ->
+                    durationMap.put(key.name(), value)
+            );
+            dto.setDurationByTransport(durationMap);
+        }
 
         if (tour.getTags() != null && !tour.getTags().isEmpty()) {
             dto.setTags(Arrays.asList(tour.getTags().split(",")));
@@ -110,6 +125,26 @@ public class TourService {
 
     }
 
+    public List<TourPointDTO> getActiveTourPointDTOS() {
+        List<Tour> tours = tourRepository.findByStatus(TourStatus.PUBLISHED);
+        List<TourPointDTO> tourPointDTOS = new ArrayList<>();
+
+        for (Tour tour : tours) {
+            TourPointDTO dto = new TourPointDTO();
+            dto.setId(tour.getId());
+            dto.setName(tour.getName());
+            dto.setPrice(tour.getPrice());
+            dto.setAuthorId(tour.getAuthorId());
+            dto.setDifficulty(tour.getDifficulty());
+            dto.setDescription(tour.getDescription());
+            dto.setStatus(tour.getStatus().toString());
+            dto.setTags(tour.getTags());
+            tourPointDTOS.add(dto);
+        }
+
+        return tourPointDTOS;
+    }
+
     public Tour getById(Long id){
         return tourRepository.getById(id);
     }
@@ -121,5 +156,50 @@ public class TourService {
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());
     }
+
+    public Tour updateTour(Tour tour) {
+        return tourRepository.save(tour);
+    }
+
+    public TourDTO addDuration(Long tourId, TransportType transportType, int minutes) {
+        Tour tour = tourRepository.findById(tourId)
+                .orElseThrow(() -> new RuntimeException("Tour not found"));
+
+        tour.getDurationByTransport().put(transportType, minutes);
+        Tour savedTour = tourRepository.save(tour);
+
+        return mapToResponseDTO(savedTour);
+    }
+
+    public TourDTO archiveTour(Long id) {
+        Tour tour = tourRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tour not found"));
+
+        if (tour.getStatus() != TourStatus.PUBLISHED) {
+            throw new RuntimeException("Only published tours can be archived");
+        }
+
+        tour.setStatus(TourStatus.ARCHIVED);
+        tour.setArchivedAt(LocalDateTime.now());
+
+        Tour savedTour = tourRepository.save(tour);
+        return mapToResponseDTO(savedTour);
+    }
+
+    public TourDTO reactivateTour(Long id) {
+        Tour tour = tourRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tour not found"));
+
+        if (tour.getStatus() != TourStatus.ARCHIVED) {
+            throw new RuntimeException("Only archived tours can be reactivated");
+        }
+
+        tour.setStatus(TourStatus.PUBLISHED);
+        tour.setArchivedAt(null);
+
+        Tour savedTour = tourRepository.save(tour);
+        return mapToResponseDTO(savedTour);
+    }
+
 
 }
