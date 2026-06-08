@@ -71,4 +71,16 @@ public class TourController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/{id}/archive")
+    public ResponseEntity<TourDTO> archiveTour(@PathVariable Long id) {
+        TourDTO response = tourService.archiveTour(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/reactivate")
+    public ResponseEntity<TourDTO> reactivateTour(@PathVariable Long id) {
+        TourDTO response = tourService.reactivateTour(id);
+        return ResponseEntity.ok(response);
+    }
+
 }

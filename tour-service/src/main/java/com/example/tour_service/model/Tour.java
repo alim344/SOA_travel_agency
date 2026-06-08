@@ -32,6 +32,8 @@ public class Tour {
     private double totalDistance;
     @Column
     private LocalDateTime publishedAt;
+    @Column
+    private LocalDateTime archivedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

@@ -26,4 +26,5 @@ public class TourDTO {
     private double totalDistance;
     private Map<String, Integer> durationByTransport;
     private LocalDateTime publishedAt;
+    private LocalDateTime archivedAt;
 }
