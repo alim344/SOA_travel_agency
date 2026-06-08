@@ -129,6 +129,7 @@ func main() {
 	javneTure := router.Group("/tour")
 	{
 		javneTure.GET("/getAllDtos", h.ProxyToTours)
+		javneTure.GET("/getAllActiveTours", h.ProxyToTours)
 	}
 
 	tour := router.Group("/tour")

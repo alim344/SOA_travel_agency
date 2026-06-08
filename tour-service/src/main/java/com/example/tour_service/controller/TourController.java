@@ -56,6 +56,12 @@ public class TourController {
         return ResponseEntity.ok().body(dtos);
     }
 
+    @GetMapping("/getAllActiveTours")
+    public ResponseEntity<List<TourPointDTO>> getAllActiveTours(){
+        List<TourPointDTO> dtos = tourService.getActiveTourPointDTOS();
+        return ResponseEntity.ok().body(dtos);
+    }
+
     @PutMapping("/{id}/publish")
     public ResponseEntity<TourDTO> publishTour(@PathVariable Long id) {
         TourDTO response = tourService.publishTour(id);

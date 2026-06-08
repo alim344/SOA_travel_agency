@@ -125,6 +125,26 @@ public class TourService {
 
     }
 
+    public List<TourPointDTO> getActiveTourPointDTOS() {
+        List<Tour> tours = tourRepository.findByStatus(TourStatus.PUBLISHED);
+        List<TourPointDTO> tourPointDTOS = new ArrayList<>();
+
+        for (Tour tour : tours) {
+            TourPointDTO dto = new TourPointDTO();
+            dto.setId(tour.getId());
+            dto.setName(tour.getName());
+            dto.setPrice(tour.getPrice());
+            dto.setAuthorId(tour.getAuthorId());
+            dto.setDifficulty(tour.getDifficulty());
+            dto.setDescription(tour.getDescription());
+            dto.setStatus(tour.getStatus().toString());
+            dto.setTags(tour.getTags());
+            tourPointDTOS.add(dto);
+        }
+
+        return tourPointDTOS;
+    }
+
     public Tour getById(Long id){
         return tourRepository.getById(id);
     }
