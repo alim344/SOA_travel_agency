@@ -142,6 +142,14 @@ func main() {
 		tour.PUT("/:id/publish", h.ProxyToTours)
 	}
 
+	session := router.Group("/session")
+	session.Use(authMiddleware.ValidateToken())
+	{
+		session.POST("/start", h.ProxyToTours)
+		session.POST("/abandon/:executionId", h.ProxyToTours)
+		session.POST("/check-position/:executionId", h.ProxyToTours)
+	}
+
 	// KeyPoint routes — token required
 	keypoint := router.Group("/keypoint")
 	keypoint.Use(authMiddleware.ValidateToken())

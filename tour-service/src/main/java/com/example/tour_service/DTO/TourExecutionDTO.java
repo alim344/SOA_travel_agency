@@ -41,6 +41,8 @@ public class TourExecutionDTO {
     @Column
     private double lastLongitude;
 
+    private Map<Long, LocalDateTime> completedKeyPointsWithTime;
+
     public TourExecutionDTO() {}
 
     public TourExecutionDTO(TourExecution tourExecution) {
@@ -53,6 +55,8 @@ public class TourExecutionDTO {
         this.lastLongitude = tourExecution.getLastLongitude();
         this.status = tourExecution.getStatus().toString();
         this.tourId = tourExecution.getTour().getId();
+        this.completedKeyPointsWithTime = tourExecution.getCompletedKeyPointsWithTime();
+
     }
 
 
