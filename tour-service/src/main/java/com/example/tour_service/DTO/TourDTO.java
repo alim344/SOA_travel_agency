@@ -23,7 +23,7 @@ public class TourDTO {
     private TourStatus status;
     private Double price;
     private Long authorId;
-    private double totalDistance;
+    private Double totalDistance;
     private Map<String, Integer> durationByTransport;
     private LocalDateTime publishedAt;
     private LocalDateTime archivedAt;

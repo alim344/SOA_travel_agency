@@ -29,7 +29,7 @@ public class Tour {
     @Column
     private String tags;
     @Column
-    private double totalDistance;
+    private Double totalDistance;
     @Column
     private LocalDateTime publishedAt;
     @Column
