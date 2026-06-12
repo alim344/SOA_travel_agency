@@ -8,6 +8,7 @@ import com.example.tour_service.model.TourStatus;
 import com.example.tour_service.DTO.TourPointDTO;
 import com.example.tour_service.model.TransportType;
 import com.example.tour_service.repo.TourRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ public class TourService {
     private TourRepository tourRepository;
 
 
+    @Transactional
     public Tour createTour(TourDTO dto, Long authorId) {
         Tour tour = new Tour();
         tour.setName(dto.getName());
@@ -47,8 +49,10 @@ public class TourService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public TourDTO getTourById(Long id) {
-        Tour tour = tourRepository.getById(id);
+        Tour tour = tourRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tour not found with id: " + id));
         return mapToResponseDTO(tour);
     }
 

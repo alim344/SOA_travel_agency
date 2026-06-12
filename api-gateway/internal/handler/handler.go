@@ -2,13 +2,19 @@ package handler
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
+	pb "api-gateway/proto"
+
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type GatewayHandler struct {
@@ -16,32 +22,37 @@ type GatewayHandler struct {
 	blogServiceURL         string
 	tourServiceURL         string
 	followerServiceURL     string
+	tourGrpcClient         pb.TourServiceClient
 }
 
-func NewGatewayHandler(stakeholdersServiceURL, blogServiceURL, tourServiceURL, followerServiceURL string) *GatewayHandler {
+func NewGatewayHandler(stakeholdersServiceURL, blogServiceURL, tourServiceURL, followerServiceURL string, tourGrpcAddr string) *GatewayHandler {
+
+	conn, err := grpc.NewClient(tourGrpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to connect to tour-service gRPC: %v", err)
+	}
+
 	return &GatewayHandler{
 		stakeholdersServiceURL: stakeholdersServiceURL,
 		blogServiceURL:         blogServiceURL,
 		tourServiceURL:         tourServiceURL,
 		followerServiceURL:     followerServiceURL,
+		tourGrpcClient:         pb.NewTourServiceClient(conn),
 	}
 }
 
-// ─── STAKEHOLDERS ─────────────────────────────────────────────────────────────
 func (h *GatewayHandler) ProxyToStakeholders(c *gin.Context) {
 	targetURL := h.stakeholdersServiceURL + c.Request.URL.Path
 	log.Printf("[Stakeholders] %s %s", c.Request.Method, targetURL)
 	h.proxyRequest(c, targetURL)
 }
 
-// ─── BLOG ─────────────────────────────────────────────────────────────────────
 func (h *GatewayHandler) ProxyToBlog(c *gin.Context) {
 	targetURL := h.blogServiceURL + c.Request.URL.Path
 	log.Printf("[Blog] %s %s", c.Request.Method, targetURL)
 	h.proxyRequest(c, targetURL)
 }
 
-// ─── FOLLOWER ─────────────────────────────────────────────────────────────────
 func (h *GatewayHandler) ProxyToFollower(c *gin.Context) {
 	path := strings.TrimPrefix(c.Request.URL.Path, "/follower")
 	targetURL := h.followerServiceURL + path
@@ -49,7 +60,6 @@ func (h *GatewayHandler) ProxyToFollower(c *gin.Context) {
 	h.proxyRequest(c, targetURL)
 }
 
-// ─── TOURS ────────────────────────────────────────────────────────────────────
 func (h *GatewayHandler) ProxyToTours(c *gin.Context) {
 	if userID, exists := c.Get("userID"); exists {
 		c.Request.Header.Set("X-User-ID", fmt.Sprintf("%d", userID.(int)))
@@ -57,15 +67,59 @@ func (h *GatewayHandler) ProxyToTours(c *gin.Context) {
 	if userRole, exists := c.Get("userRole"); exists {
 		c.Request.Header.Set("X-User-Role", userRole.(string))
 	}
-
 	targetURL := h.tourServiceURL + c.Request.URL.Path
 	log.Printf("[Tours] %s %s", c.Request.Method, targetURL)
 	h.proxyRequest(c, targetURL)
 }
 
-// ─── CORE PROXY ───────────────────────────────────────────────────────────────
-// Reads the incoming request, forwards it to targetURL,
-// and copies the response (status, headers, body) back to the client.
+func (h *GatewayHandler) GetTourByIdGrpc(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid tour ID"})
+		return
+	}
+
+	resp, err := h.tourGrpcClient.GetTourById(context.Background(), &pb.GetTourByIdRequest{Id: id})
+	if err != nil {
+		log.Printf("[gRPC ERROR] GetTourById: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+func (h *GatewayHandler) CreateTourGrpc(c *gin.Context) {
+	var body struct {
+		Name        string   `json:"name"`
+		Description string   `json:"description"`
+		Difficulty  int32    `json:"difficulty"`
+		Tags        []string `json:"tags"`
+		AuthorId    int64    `json:"author_id"`
+	}
+
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	resp, err := h.tourGrpcClient.CreateTour(context.Background(), &pb.CreateTourRequest{
+		Name:        body.Name,
+		Description: body.Description,
+		Difficulty:  body.Difficulty,
+		Tags:        body.Tags,
+		AuthorId:    body.AuthorId,
+	})
+	if err != nil {
+		log.Printf("[gRPC ERROR] CreateTour: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
 func (h *GatewayHandler) proxyRequest(c *gin.Context, targetURL string) {
 	bodyBytes, err := io.ReadAll(c.Request.Body)
 	if err != nil {
@@ -80,14 +134,12 @@ func (h *GatewayHandler) proxyRequest(c *gin.Context, targetURL string) {
 		return
 	}
 
-	// Forward all headers (Authorization,..)
 	for key, values := range c.Request.Header {
 		for _, val := range values {
 			req.Header.Add(key, val)
 		}
 	}
 
-	// Forward query parameters
 	req.URL.RawQuery = c.Request.URL.RawQuery
 
 	resp, err := http.DefaultClient.Do(req)
