@@ -37,6 +37,11 @@ func main() {
 		followerServiceURL = "http://follower-service:8084"
 	}
 
+	tourGrpcAddr := os.Getenv("TOUR_GRPC_ADDR")
+	if tourGrpcAddr == "" {
+		tourGrpcAddr = "tour-service:9090"
+	}
+
 	authServiceURL := stakeholdersServiceURL
 
 	router := gin.Default()
@@ -54,7 +59,7 @@ func main() {
 	config.AllowCredentials = true
 	router.Use(cors.New(config))
 
-	h := handler.NewGatewayHandler(stakeholdersServiceURL, blogServiceURL, tourServiceURL, followerServiceURL)
+	h := handler.NewGatewayHandler(stakeholdersServiceURL, blogServiceURL, tourServiceURL, followerServiceURL, tourGrpcAddr)
 	authMiddleware := middleware.NewAuthMiddleware(authServiceURL)
 
 	router.GET("/health", func(c *gin.Context) {
@@ -135,15 +140,15 @@ func main() {
 	tour := router.Group("/tour")
 	tour.Use(authMiddleware.ValidateToken())
 	{
-		tour.POST("", h.ProxyToTours)
 		tour.GET("/author/:authorId", h.ProxyToTours)
 		tour.GET("/nodraft/guide/:authorId", h.ProxyToTours)
 		tour.GET("/author", h.ProxyToTours)
-		tour.GET("/:id", h.ProxyToTours)
 		tour.PUT("/:id/publish", h.ProxyToTours)
 		tour.POST("/:id/duration", h.ProxyToTours)
 		tour.POST("/:id/archive", h.ProxyToTours)
-        tour.POST("/:id/reactivate", h.ProxyToTours)
+		tour.POST("/:id/reactivate", h.ProxyToTours)
+		tour.POST("", h.CreateTourGrpc)     //
+		tour.GET("/:id", h.GetTourByIdGrpc) //
 	}
 
 	session := router.Group("/session")

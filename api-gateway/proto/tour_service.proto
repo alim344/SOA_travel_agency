@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option go_package = "./proto";
+
+service TourService {
+  rpc GetTourById (GetTourByIdRequest) returns (TourResponse);
+  rpc CreateTour (CreateTourRequest) returns (CreateTourResponse);
+}
+
+message GetTourByIdRequest {
+  int64 id = 1;
+}
+
+message CreateTourRequest {
+  string name = 1;
+  string description = 2;
+  int32 difficulty = 3;
+  repeated string tags = 4;
+  int64 author_id = 5;
+}
+
+message TourResponse {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  int32 difficulty = 4;
+  repeated string tags = 5;
+  string status = 6;
+  double price = 7;
+  int64 author_id = 8;
+  double total_distance = 9;
+}
+
+message CreateTourResponse {
+  string message = 1;
+}
