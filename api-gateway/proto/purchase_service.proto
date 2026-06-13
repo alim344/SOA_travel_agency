@@ -10,6 +10,7 @@ service PurchaseService {
   rpc AddToCart (AddToCartRequest) returns (CartResponse);
   rpc RemoveFromCart (RemoveFromCartRequest) returns (CartResponse);
   rpc Checkout (CheckoutRequest) returns (CheckoutResponse);
+  rpc GetCart (GetCartRequest) returns (CartResponse);
 }
 
 message AddToCartRequest {
@@ -39,4 +40,8 @@ message CartResponse {
 
 message CheckoutResponse {
   repeated string tokens = 1;
+}
+
+message GetCartRequest {
+  int64 tourist_id = 1;
 }

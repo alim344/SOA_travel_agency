@@ -113,4 +113,13 @@ public class PurchaseService {
 
         return tokens;
     }
+
+    public ShoppingCart getCart(Long touristId) {
+        return cartRepository.findByTouristId(touristId)
+                .orElse(ShoppingCart.builder()
+                        .touristId(touristId)
+                        .items(new ArrayList<>())
+                        .totalPrice(0.0)
+                        .build());
+    }
 }

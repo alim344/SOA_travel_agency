@@ -6,6 +6,7 @@ import com.example.purchase_service.service.PurchaseService;
 import com.example.purchase_service.proto.AddToCartRequest;
 import com.example.purchase_service.proto.CartResponse;
 import com.example.purchase_service.proto.CheckoutRequest;
+import com.example.purchase_service.proto.GetCartRequest;
 import com.example.purchase_service.proto.CheckoutResponse;
 import com.example.purchase_service.proto.OrderItem.Builder;
 import com.example.purchase_service.proto.PurchaseServiceGrpc;
@@ -46,6 +47,19 @@ public class PurchaseGrpcServer extends PurchaseServiceGrpc.PurchaseServiceImplB
                     request.getTouristId(),
                     request.getTourId()
             );
+            responseObserver.onNext(toCartResponse(cart));
+            responseObserver.onCompleted();
+        } catch (RuntimeException e) {
+            responseObserver.onError(
+                    Status.NOT_FOUND.withDescription(e.getMessage()).asRuntimeException()
+            );
+        }
+    }
+
+    @Override
+    public void getCart(GetCartRequest request, StreamObserver<CartResponse> responseObserver) {
+        try {
+            ShoppingCart cart = purchaseService.getCart(request.getTouristId());
             responseObserver.onNext(toCartResponse(cart));
             responseObserver.onCompleted();
         } catch (RuntimeException e) {

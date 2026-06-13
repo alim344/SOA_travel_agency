@@ -141,6 +141,7 @@ func main() {
 		purchase.POST("/add", h.AddToCartGrpc)
 		purchase.POST("/remove", h.RemoveFromCartGrpc)
 		purchase.POST("/checkout", h.CheckoutGrpc)
+		purchase.GET("/cart", h.GetCartGrpc)
 	}
 
 	// TOUR SERVICE (Spring, port 8080)

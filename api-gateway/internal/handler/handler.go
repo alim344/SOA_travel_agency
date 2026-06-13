@@ -198,6 +198,22 @@ func (h *GatewayHandler) AddToCartGrpc(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+func (h *GatewayHandler) GetCartGrpc(c *gin.Context) {
+	touristID, ok := getUserID(c)
+	if !ok {
+		return
+	}
+
+	resp, err := h.purchaseGrpcClient.GetCart(context.Background(), &pb.GetCartRequest{
+		TouristId: touristID,
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
 func (h *GatewayHandler) RemoveFromCartGrpc(c *gin.Context) {
 	touristID, ok := getUserID(c)
 	if !ok {

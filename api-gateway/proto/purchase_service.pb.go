@@ -325,6 +325,50 @@ func (x *CheckoutResponse) GetTokens() []string {
 	return nil
 }
 
+type GetCartRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TouristId     int64                  `protobuf:"varint,1,opt,name=tourist_id,json=touristId,proto3" json:"tourist_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCartRequest) Reset() {
+	*x = GetCartRequest{}
+	mi := &file_proto_purchase_service_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCartRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCartRequest) ProtoMessage() {}
+
+func (x *GetCartRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_purchase_service_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCartRequest.ProtoReflect.Descriptor instead.
+func (*GetCartRequest) Descriptor() ([]byte, []int) {
+	return file_proto_purchase_service_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetCartRequest) GetTouristId() int64 {
+	if x != nil {
+		return x.TouristId
+	}
+	return 0
+}
+
 var File_proto_purchase_service_proto protoreflect.FileDescriptor
 
 const file_proto_purchase_service_proto_rawDesc = "" +
@@ -351,11 +395,15 @@ const file_proto_purchase_service_proto_rawDesc = "" +
 	"\vtotal_price\x18\x02 \x01(\x01R\n" +
 	"totalPrice\"*\n" +
 	"\x10CheckoutResponse\x12\x16\n" +
-	"\x06tokens\x18\x01 \x03(\tR\x06tokens2\xaa\x01\n" +
+	"\x06tokens\x18\x01 \x03(\tR\x06tokens\"/\n" +
+	"\x0eGetCartRequest\x12\x1d\n" +
+	"\n" +
+	"tourist_id\x18\x01 \x01(\x03R\ttouristId2\xd5\x01\n" +
 	"\x0fPurchaseService\x12-\n" +
 	"\tAddToCart\x12\x11.AddToCartRequest\x1a\r.CartResponse\x127\n" +
 	"\x0eRemoveFromCart\x12\x16.RemoveFromCartRequest\x1a\r.CartResponse\x12/\n" +
-	"\bCheckout\x12\x10.CheckoutRequest\x1a\x11.CheckoutResponseBE\n" +
+	"\bCheckout\x12\x10.CheckoutRequest\x1a\x11.CheckoutResponse\x12)\n" +
+	"\aGetCart\x12\x0f.GetCartRequest\x1a\r.CartResponseBE\n" +
 	"\"com.example.purchase_service.protoB\x14PurchaseServiceProtoP\x01Z\a./protob\x06proto3"
 
 var (
@@ -370,7 +418,7 @@ func file_proto_purchase_service_proto_rawDescGZIP() []byte {
 	return file_proto_purchase_service_proto_rawDescData
 }
 
-var file_proto_purchase_service_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_proto_purchase_service_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_proto_purchase_service_proto_goTypes = []any{
 	(*AddToCartRequest)(nil),      // 0: AddToCartRequest
 	(*RemoveFromCartRequest)(nil), // 1: RemoveFromCartRequest
@@ -378,17 +426,20 @@ var file_proto_purchase_service_proto_goTypes = []any{
 	(*OrderItem)(nil),             // 3: OrderItem
 	(*CartResponse)(nil),          // 4: CartResponse
 	(*CheckoutResponse)(nil),      // 5: CheckoutResponse
+	(*GetCartRequest)(nil),        // 6: GetCartRequest
 }
 var file_proto_purchase_service_proto_depIdxs = []int32{
 	3, // 0: CartResponse.items:type_name -> OrderItem
 	0, // 1: PurchaseService.AddToCart:input_type -> AddToCartRequest
 	1, // 2: PurchaseService.RemoveFromCart:input_type -> RemoveFromCartRequest
 	2, // 3: PurchaseService.Checkout:input_type -> CheckoutRequest
-	4, // 4: PurchaseService.AddToCart:output_type -> CartResponse
-	4, // 5: PurchaseService.RemoveFromCart:output_type -> CartResponse
-	5, // 6: PurchaseService.Checkout:output_type -> CheckoutResponse
-	4, // [4:7] is the sub-list for method output_type
-	1, // [1:4] is the sub-list for method input_type
+	6, // 4: PurchaseService.GetCart:input_type -> GetCartRequest
+	4, // 5: PurchaseService.AddToCart:output_type -> CartResponse
+	4, // 6: PurchaseService.RemoveFromCart:output_type -> CartResponse
+	5, // 7: PurchaseService.Checkout:output_type -> CheckoutResponse
+	4, // 8: PurchaseService.GetCart:output_type -> CartResponse
+	5, // [5:9] is the sub-list for method output_type
+	1, // [1:5] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -405,7 +456,7 @@ func file_proto_purchase_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_purchase_service_proto_rawDesc), len(file_proto_purchase_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
