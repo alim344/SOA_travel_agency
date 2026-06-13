@@ -49,6 +49,4 @@ public class Tour {
     @ElementCollection
     @MapKeyEnumerated(EnumType.STRING)
     private Map<TransportType, Integer> durationByTransport = new HashMap<>();
-
-
 }

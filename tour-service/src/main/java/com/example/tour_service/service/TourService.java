@@ -38,6 +38,7 @@ public class TourService {
         tour.setAuthorId(authorId);
         tour.setStatus(TourStatus.DRAFT);
         tour.setPrice(0.0);
+        tour.setTotalDistance(0.0);
 
         return tourRepository.save(tour);
     }
