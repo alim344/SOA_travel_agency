@@ -157,3 +157,105 @@ var TourService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "proto/tour_service.proto",
 }
+
+const (
+	TourExecutionService_CheckPosition_FullMethodName = "/TourExecutionService/CheckPosition"
+)
+
+// TourExecutionServiceClient is the client API for TourExecutionService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type TourExecutionServiceClient interface {
+	CheckPosition(ctx context.Context, in *CheckPositionRequest, opts ...grpc.CallOption) (*TourExecutionResponse, error)
+}
+
+type tourExecutionServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewTourExecutionServiceClient(cc grpc.ClientConnInterface) TourExecutionServiceClient {
+	return &tourExecutionServiceClient{cc}
+}
+
+func (c *tourExecutionServiceClient) CheckPosition(ctx context.Context, in *CheckPositionRequest, opts ...grpc.CallOption) (*TourExecutionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TourExecutionResponse)
+	err := c.cc.Invoke(ctx, TourExecutionService_CheckPosition_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// TourExecutionServiceServer is the server API for TourExecutionService service.
+// All implementations must embed UnimplementedTourExecutionServiceServer
+// for forward compatibility.
+type TourExecutionServiceServer interface {
+	CheckPosition(context.Context, *CheckPositionRequest) (*TourExecutionResponse, error)
+	mustEmbedUnimplementedTourExecutionServiceServer()
+}
+
+// UnimplementedTourExecutionServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedTourExecutionServiceServer struct{}
+
+func (UnimplementedTourExecutionServiceServer) CheckPosition(context.Context, *CheckPositionRequest) (*TourExecutionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CheckPosition not implemented")
+}
+func (UnimplementedTourExecutionServiceServer) mustEmbedUnimplementedTourExecutionServiceServer() {}
+func (UnimplementedTourExecutionServiceServer) testEmbeddedByValue()                              {}
+
+// UnsafeTourExecutionServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to TourExecutionServiceServer will
+// result in compilation errors.
+type UnsafeTourExecutionServiceServer interface {
+	mustEmbedUnimplementedTourExecutionServiceServer()
+}
+
+func RegisterTourExecutionServiceServer(s grpc.ServiceRegistrar, srv TourExecutionServiceServer) {
+	// If the following call panics, it indicates UnimplementedTourExecutionServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&TourExecutionService_ServiceDesc, srv)
+}
+
+func _TourExecutionService_CheckPosition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckPositionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TourExecutionServiceServer).CheckPosition(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TourExecutionService_CheckPosition_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TourExecutionServiceServer).CheckPosition(ctx, req.(*CheckPositionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// TourExecutionService_ServiceDesc is the grpc.ServiceDesc for TourExecutionService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var TourExecutionService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "TourExecutionService",
+	HandlerType: (*TourExecutionServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CheckPosition",
+			Handler:    _TourExecutionService_CheckPosition_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto/tour_service.proto",
+}
