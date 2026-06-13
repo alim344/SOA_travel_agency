@@ -170,7 +170,8 @@ func main() {
 	{
 		session.POST("/start", h.ProxyToTours)
 		session.POST("/abandon/:executionId", h.ProxyToTours)
-		session.POST("/check-position/:executionId", h.ProxyToTours)
+		//session.POST("/check-position/:executionId", h.ProxyToTours)
+		session.POST("/check-position/:executionId", h.CheckPositionGrpc)
 	}
 
 	// KeyPoint routes — token required

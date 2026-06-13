@@ -38,7 +38,7 @@ public class TourExecutionController {
 
     }
 
-    @PostMapping("/check-position/{executionId}")
+   /* @PostMapping("/check-position/{executionId}")
     public ResponseEntity<TourExecutionDTO> checkPosition(@PathVariable Long executionId, @RequestBody LocationDTO location){
 
         TourExecutionDTO execution = tourExecutionService.checkPosition(executionId, location);
@@ -46,6 +46,6 @@ public class TourExecutionController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(execution);
-    }
+    }*/
 
 }

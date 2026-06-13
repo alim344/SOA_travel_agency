@@ -7,6 +7,10 @@ service TourService {
   rpc CreateTour (CreateTourRequest) returns (CreateTourResponse);
 }
 
+service TourExecutionService {
+  rpc CheckPosition (CheckPositionRequest) returns (TourExecutionResponse);
+}
+
 message GetTourByIdRequest {
   int64 id = 1;
 }
@@ -33,4 +37,23 @@ message TourResponse {
 
 message CreateTourResponse {
   string message = 1;
+}
+
+message CheckPositionRequest {
+  int64 execution_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+}
+
+message TourExecutionResponse {
+  int64 execution_id = 1;
+  int64 tourist_id = 2;
+  int64 tour_id = 3;
+  string status = 4;
+  string start_time = 5;
+  string end_time = 6;
+  string last_activity_date_time = 7;
+  double last_latitude = 8;
+  double last_longitude = 9;
+  map<int64, string> completed_key_points_with_time = 10;
 }

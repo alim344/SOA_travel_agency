@@ -24,6 +24,7 @@ type GatewayHandler struct {
 	followerServiceURL     string
 	tourGrpcClient         pb.TourServiceClient
 	purchaseGrpcClient     pb.PurchaseServiceClient
+	tourExecutionClient    pb.TourExecutionServiceClient
 }
 
 func NewGatewayHandler(stakeholdersServiceURL, blogServiceURL, tourServiceURL, followerServiceURL string, tourGrpcAddr string, purchaseGrpcAddr string) *GatewayHandler {
@@ -45,6 +46,7 @@ func NewGatewayHandler(stakeholdersServiceURL, blogServiceURL, tourServiceURL, f
 		followerServiceURL:     followerServiceURL,
 		tourGrpcClient:         pb.NewTourServiceClient(conn),
 		purchaseGrpcClient:     pb.NewPurchaseServiceClient(purchaseConn),
+		tourExecutionClient:    pb.NewTourExecutionServiceClient(conn),
 	}
 }
 
@@ -125,6 +127,48 @@ func (h *GatewayHandler) CreateTourGrpc(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, resp)
+}
+
+func (h *GatewayHandler) CheckPositionGrpc(c *gin.Context) {
+	idStr := c.Param("executionId")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid execution ID"})
+		return
+	}
+
+	var body struct {
+		Latitude  float64 `json:"latitude"`
+		Longitude float64 `json:"longitude"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	resp, err := h.tourExecutionClient.CheckPosition(context.Background(), &pb.CheckPositionRequest{
+		ExecutionId: id,
+		Latitude:    body.Latitude,
+		Longitude:   body.Longitude,
+	})
+	if err != nil {
+		log.Printf("[gRPC ERROR] CheckPosition: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"id":                         resp.ExecutionId,
+		"touristId":                  resp.TouristId,
+		"tourId":                     resp.TourId,
+		"status":                     resp.Status,
+		"startTime":                  resp.StartTime,
+		"endTime":                    resp.EndTime,
+		"lastActivityDateTime":       resp.LastActivityDateTime,
+		"lastLatitude":               resp.LastLatitude,
+		"lastLongitude":              resp.LastLongitude,
+		"completedKeyPointsWithTime": resp.CompletedKeyPointsWithTime,
+	})
 }
 
 func (h *GatewayHandler) AddToCartGrpc(c *gin.Context) {

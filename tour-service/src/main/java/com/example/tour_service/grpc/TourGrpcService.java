@@ -29,7 +29,7 @@ public class TourGrpcService extends TourServiceGrpc.TourServiceImplBase {
                 .setStatus(dto.getStatus().name())
                 .setPrice(dto.getPrice())
                 .setAuthorId(dto.getAuthorId())
-                .setTotalDistance(dto.getTotalDistance())
+                .setTotalDistance(dto.getTotalDistance() != null ? dto.getTotalDistance() : 0.0)
                 .build();
 
         responseObserver.onNext(response);
