@@ -22,6 +22,7 @@ const (
 	PurchaseService_AddToCart_FullMethodName      = "/PurchaseService/AddToCart"
 	PurchaseService_RemoveFromCart_FullMethodName = "/PurchaseService/RemoveFromCart"
 	PurchaseService_Checkout_FullMethodName       = "/PurchaseService/Checkout"
+	PurchaseService_GetCart_FullMethodName        = "/PurchaseService/GetCart"
 )
 
 // PurchaseServiceClient is the client API for PurchaseService service.
@@ -31,6 +32,7 @@ type PurchaseServiceClient interface {
 	AddToCart(ctx context.Context, in *AddToCartRequest, opts ...grpc.CallOption) (*CartResponse, error)
 	RemoveFromCart(ctx context.Context, in *RemoveFromCartRequest, opts ...grpc.CallOption) (*CartResponse, error)
 	Checkout(ctx context.Context, in *CheckoutRequest, opts ...grpc.CallOption) (*CheckoutResponse, error)
+	GetCart(ctx context.Context, in *GetCartRequest, opts ...grpc.CallOption) (*CartResponse, error)
 }
 
 type purchaseServiceClient struct {
@@ -71,6 +73,16 @@ func (c *purchaseServiceClient) Checkout(ctx context.Context, in *CheckoutReques
 	return out, nil
 }
 
+func (c *purchaseServiceClient) GetCart(ctx context.Context, in *GetCartRequest, opts ...grpc.CallOption) (*CartResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CartResponse)
+	err := c.cc.Invoke(ctx, PurchaseService_GetCart_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PurchaseServiceServer is the server API for PurchaseService service.
 // All implementations must embed UnimplementedPurchaseServiceServer
 // for forward compatibility.
@@ -78,6 +90,7 @@ type PurchaseServiceServer interface {
 	AddToCart(context.Context, *AddToCartRequest) (*CartResponse, error)
 	RemoveFromCart(context.Context, *RemoveFromCartRequest) (*CartResponse, error)
 	Checkout(context.Context, *CheckoutRequest) (*CheckoutResponse, error)
+	GetCart(context.Context, *GetCartRequest) (*CartResponse, error)
 	mustEmbedUnimplementedPurchaseServiceServer()
 }
 
@@ -96,6 +109,9 @@ func (UnimplementedPurchaseServiceServer) RemoveFromCart(context.Context, *Remov
 }
 func (UnimplementedPurchaseServiceServer) Checkout(context.Context, *CheckoutRequest) (*CheckoutResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Checkout not implemented")
+}
+func (UnimplementedPurchaseServiceServer) GetCart(context.Context, *GetCartRequest) (*CartResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetCart not implemented")
 }
 func (UnimplementedPurchaseServiceServer) mustEmbedUnimplementedPurchaseServiceServer() {}
 func (UnimplementedPurchaseServiceServer) testEmbeddedByValue()                         {}
@@ -172,6 +188,24 @@ func _PurchaseService_Checkout_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PurchaseService_GetCart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCartRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PurchaseServiceServer).GetCart(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PurchaseService_GetCart_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PurchaseServiceServer).GetCart(ctx, req.(*GetCartRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PurchaseService_ServiceDesc is the grpc.ServiceDesc for PurchaseService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -190,6 +224,10 @@ var PurchaseService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Checkout",
 			Handler:    _PurchaseService_Checkout_Handler,
+		},
+		{
+			MethodName: "GetCart",
+			Handler:    _PurchaseService_GetCart_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
