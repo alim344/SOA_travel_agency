@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.example.purchase_service.proto";
+option java_outer_classname = "PurchaseServiceProto";
+
+service PurchaseService {
+  rpc AddToCart (AddToCartRequest) returns (CartResponse);
+  rpc RemoveFromCart (RemoveFromCartRequest) returns (CartResponse);
+  rpc Checkout (CheckoutRequest) returns (CheckoutResponse);
+}
+
+message AddToCartRequest {
+  int64 tourist_id = 1;
+  int64 tour_id = 2;
+}
+
+message RemoveFromCartRequest {
+  int64 tourist_id = 1;
+  int64 tour_id = 2;
+}
+
+message CheckoutRequest {
+  int64 tourist_id = 1;
+}
+
+message OrderItem {
+  int64 tour_id = 1;
+  string tour_name = 2;
+  double price = 3;
+}
+
+message CartResponse {
+  repeated OrderItem items = 1;
+  double total_price = 2;
+}
+
+message CheckoutResponse {
+  repeated string tokens = 1;
+}
