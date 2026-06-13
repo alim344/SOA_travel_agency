@@ -163,6 +163,7 @@ func main() {
 		tour.POST("/:id/reactivate", h.ProxyToTours)
 		tour.POST("", h.CreateTourGrpc)     //
 		tour.GET("/:id", h.GetTourByIdGrpc) //
+		tour.PUT("/:id/price", h.ProxyToTours)
 	}
 
 	session := router.Group("/session")

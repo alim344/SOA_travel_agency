@@ -206,5 +206,22 @@ public class TourService {
         return mapToResponseDTO(savedTour);
     }
 
+    public TourDTO updateTourPrice(Long id, Double newPrice) {
+        Tour tour = tourRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tour not found"));
+
+        if (tour.getStatus() != TourStatus.DRAFT) {
+            throw new RuntimeException("Price can only be changed for DRAFT tours");
+        }
+
+        if (newPrice == null || newPrice < 0) {
+            throw new RuntimeException("Price must be a positive number");
+        }
+
+        tour.setPrice(newPrice);
+        Tour savedTour = tourRepository.save(tour);
+        return mapToResponseDTO(savedTour);
+    }
+
 
 }

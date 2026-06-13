@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+
 import com.example.tour_service.DTO.TourPointDTO;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -86,6 +88,13 @@ public class TourController {
     @PostMapping("/{id}/reactivate")
     public ResponseEntity<TourDTO> reactivateTour(@PathVariable Long id) {
         TourDTO response = tourService.reactivateTour(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}/price")
+    public ResponseEntity<TourDTO> updateTourPrice(@PathVariable Long id, @RequestBody Map<String, Double> request) {
+        Double newPrice = request.get("price");
+        TourDTO response = tourService.updateTourPrice(id, newPrice);
         return ResponseEntity.ok(response);
     }
 
