@@ -51,6 +51,14 @@ services:
     volumes:
       - tour_db_data:/var/lib/postgresql/data
 
+  purchase-db:
+    image: mongo:7
+    container_name: purchase_db
+    ports:
+      - "27018:27017"
+    volumes:
+      - purchase_db_data:/data/db
+
   # ─── SERVICES ────────────────────────────────────────
 
   stakeholders-service:
@@ -109,10 +117,24 @@ services:
       BLOG_SERVICE_URL: http://blogs-service:8001
       TOUR_SERVICE_URL: http://tour-service:8085
       FOLLOWER_SERVICE_URL: http://follower-service:8084
+      PURCHASE_GRPC_ADDR: purchase-service:9093
     depends_on:
       - stakeholders-service
       - blogs-service
       - follower-service
+      - tour-service
+      - purchase-service
+
+  purchase-service:
+    build: ./purchase_service
+    container_name: purchase-service
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://purchase-db:27017/purchase_db
+      GRPC_SERVER_PORT: "9093"
+      TOUR_GRPC_HOST: tour-service
+      TOUR_GRPC_PORT: "9090"
+    depends_on:
+      - purchase-db
       - tour-service
 
 volumes:
@@ -121,3 +143,4 @@ volumes:
   neo4j_data:
   neo4j_logs:
   tour_db_data:
+  purchase_db_data:

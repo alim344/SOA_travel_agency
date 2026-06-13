@@ -10,7 +10,6 @@ import com.example.purchase_service.proto.CheckoutResponse;
 import com.example.purchase_service.proto.OrderItem.Builder;
 import com.example.purchase_service.proto.PurchaseServiceGrpc;
 import com.example.purchase_service.proto.RemoveFromCartRequest;
-import com.example.purchase_service.service.PurchaseService;
 import io.grpc.stub.StreamObserver;
 import io.grpc.Status;
 import lombok.RequiredArgsConstructor;

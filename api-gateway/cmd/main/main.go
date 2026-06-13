@@ -42,6 +42,11 @@ func main() {
 		tourGrpcAddr = "tour-service:9090"
 	}
 
+	purchaseGrpcAddr := os.Getenv("PURCHASE_GRPC_ADDR")
+	if purchaseGrpcAddr == "" {
+		purchaseGrpcAddr = "purchase-service:9093"
+	}
+
 	authServiceURL := stakeholdersServiceURL
 
 	router := gin.Default()
@@ -59,7 +64,7 @@ func main() {
 	config.AllowCredentials = true
 	router.Use(cors.New(config))
 
-	h := handler.NewGatewayHandler(stakeholdersServiceURL, blogServiceURL, tourServiceURL, followerServiceURL, tourGrpcAddr)
+	h := handler.NewGatewayHandler(stakeholdersServiceURL, blogServiceURL, tourServiceURL, followerServiceURL, tourGrpcAddr, purchaseGrpcAddr)
 	authMiddleware := middleware.NewAuthMiddleware(authServiceURL)
 
 	router.GET("/health", func(c *gin.Context) {
@@ -129,6 +134,15 @@ func main() {
 		follower.GET("/recommendations", h.ProxyToFollower)
 	}
 
+	//PURCHASE SERVICE (Spring, port 9093 token required)
+	purchase := router.Group("/purchase")
+	purchase.Use(authMiddleware.ValidateToken())
+	{
+		purchase.POST("/add", h.AddToCartGrpc)
+		purchase.POST("/remove", h.RemoveFromCartGrpc)
+		purchase.POST("/checkout", h.CheckoutGrpc)
+	}
+
 	// TOUR SERVICE (Spring, port 8080)
 	// Tour routes — token required
 	javneTure := router.Group("/tour")
@@ -182,6 +196,7 @@ func main() {
 	log.Printf("Blog:         %s", blogServiceURL)
 	log.Printf("Tours:        %s", tourServiceURL)
 	log.Printf("Follower:     %s", followerServiceURL)
+	log.Printf("Purchase:     %s", purchaseGrpcAddr)
 
 	if err := router.Run(":" + port); err != nil {
 		log.Fatal("Failed to start API Gateway:", err)

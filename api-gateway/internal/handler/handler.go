@@ -23,13 +23,19 @@ type GatewayHandler struct {
 	tourServiceURL         string
 	followerServiceURL     string
 	tourGrpcClient         pb.TourServiceClient
+	purchaseGrpcClient     pb.PurchaseServiceClient
 }
 
-func NewGatewayHandler(stakeholdersServiceURL, blogServiceURL, tourServiceURL, followerServiceURL string, tourGrpcAddr string) *GatewayHandler {
+func NewGatewayHandler(stakeholdersServiceURL, blogServiceURL, tourServiceURL, followerServiceURL string, tourGrpcAddr string, purchaseGrpcAddr string) *GatewayHandler {
 
 	conn, err := grpc.NewClient(tourGrpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to connect to tour-service gRPC: %v", err)
+	}
+
+	purchaseConn, err := grpc.NewClient(purchaseGrpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to connect to purchase-service gRPC: %v", err)
 	}
 
 	return &GatewayHandler{
@@ -38,6 +44,7 @@ func NewGatewayHandler(stakeholdersServiceURL, blogServiceURL, tourServiceURL, f
 		tourServiceURL:         tourServiceURL,
 		followerServiceURL:     followerServiceURL,
 		tourGrpcClient:         pb.NewTourServiceClient(conn),
+		purchaseGrpcClient:     pb.NewPurchaseServiceClient(purchaseConn),
 	}
 }
 
@@ -118,6 +125,87 @@ func (h *GatewayHandler) CreateTourGrpc(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, resp)
+}
+
+func (h *GatewayHandler) AddToCartGrpc(c *gin.Context) {
+	touristID, ok := getUserID(c)
+	if !ok {
+		return
+	}
+
+	var body struct {
+		TourId int64 `json:"tour_id"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	resp, err := h.purchaseGrpcClient.AddToCart(context.Background(), &pb.AddToCartRequest{
+		TouristId: touristID,
+		TourId:    body.TourId,
+	})
+	if err != nil {
+		log.Printf("[gRPC ERROR] AddToCart: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+func (h *GatewayHandler) RemoveFromCartGrpc(c *gin.Context) {
+	touristID, ok := getUserID(c)
+	if !ok {
+		return
+	}
+
+	var body struct {
+		TourId int64 `json:"tour_id"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	resp, err := h.purchaseGrpcClient.RemoveFromCart(context.Background(), &pb.RemoveFromCartRequest{
+		TouristId: touristID,
+		TourId:    body.TourId,
+	})
+	if err != nil {
+		log.Printf("[gRPC ERROR] RemoveFromCart: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+func (h *GatewayHandler) CheckoutGrpc(c *gin.Context) {
+	touristID, ok := getUserID(c)
+	if !ok {
+		return
+	}
+
+	resp, err := h.purchaseGrpcClient.Checkout(context.Background(), &pb.CheckoutRequest{
+		TouristId: touristID,
+	})
+	if err != nil {
+		log.Printf("[gRPC ERROR] Checkout: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+func getUserID(c *gin.Context) (int64, bool) {
+	userIDRaw, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return 0, false
+	}
+	return int64(userIDRaw.(int)), true
 }
 
 func (h *GatewayHandler) proxyRequest(c *gin.Context, targetURL string) {
