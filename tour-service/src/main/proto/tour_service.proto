@@ -35,6 +35,7 @@ message TourResponse {
   double price = 7;
   int64 author_id = 8;
   double total_distance = 9;
+  map<string, int32> duration_by_transport = 10;  
 }
 
 message CreateTourResponse {

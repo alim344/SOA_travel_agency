@@ -8,6 +8,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Map;
 
 @GrpcService
 public class TourGrpcService extends TourServiceGrpc.TourServiceImplBase {
@@ -30,6 +31,7 @@ public class TourGrpcService extends TourServiceGrpc.TourServiceImplBase {
                 .setPrice(dto.getPrice())
                 .setAuthorId(dto.getAuthorId())
                 .setTotalDistance(dto.getTotalDistance() != null ? dto.getTotalDistance() : 0.0)
+                .putAllDurationByTransport(dto.getDurationByTransport() != null ? dto.getDurationByTransport() : Map.of())  
                 .build();
 
         responseObserver.onNext(response);

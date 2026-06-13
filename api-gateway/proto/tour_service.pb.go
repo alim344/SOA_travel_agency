@@ -142,18 +142,19 @@ func (x *CreateTourRequest) GetAuthorId() int64 {
 }
 
 type TourResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Difficulty    int32                  `protobuf:"varint,4,opt,name=difficulty,proto3" json:"difficulty,omitempty"`
-	Tags          []string               `protobuf:"bytes,5,rep,name=tags,proto3" json:"tags,omitempty"`
-	Status        string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
-	Price         float64                `protobuf:"fixed64,7,opt,name=price,proto3" json:"price,omitempty"`
-	AuthorId      int64                  `protobuf:"varint,8,opt,name=author_id,json=authorId,proto3" json:"author_id,omitempty"`
-	TotalDistance float64                `protobuf:"fixed64,9,opt,name=total_distance,json=totalDistance,proto3" json:"total_distance,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Id                  int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description         string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Difficulty          int32                  `protobuf:"varint,4,opt,name=difficulty,proto3" json:"difficulty,omitempty"`
+	Tags                []string               `protobuf:"bytes,5,rep,name=tags,proto3" json:"tags,omitempty"`
+	Status              string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
+	Price               float64                `protobuf:"fixed64,7,opt,name=price,proto3" json:"price,omitempty"`
+	AuthorId            int64                  `protobuf:"varint,8,opt,name=author_id,json=authorId,proto3" json:"author_id,omitempty"`
+	TotalDistance       float64                `protobuf:"fixed64,9,opt,name=total_distance,json=totalDistance,proto3" json:"total_distance,omitempty"`
+	DurationByTransport map[string]int32       `protobuf:"bytes,10,rep,name=duration_by_transport,json=durationByTransport,proto3" json:"duration_by_transport,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *TourResponse) Reset() {
@@ -247,6 +248,13 @@ func (x *TourResponse) GetTotalDistance() float64 {
 		return x.TotalDistance
 	}
 	return 0
+}
+
+func (x *TourResponse) GetDurationByTransport() map[string]int32 {
+	if x != nil {
+		return x.DurationByTransport
+	}
+	return nil
 }
 
 type CreateTourResponse struct {
@@ -483,7 +491,7 @@ const file_proto_tour_service_proto_rawDesc = "" +
 	"difficulty\x18\x03 \x01(\x05R\n" +
 	"difficulty\x12\x12\n" +
 	"\x04tags\x18\x04 \x03(\tR\x04tags\x12\x1b\n" +
-	"\tauthor_id\x18\x05 \x01(\x03R\bauthorId\"\xfa\x01\n" +
+	"\tauthor_id\x18\x05 \x01(\x03R\bauthorId\"\x9e\x03\n" +
 	"\fTourResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -495,7 +503,12 @@ const file_proto_tour_service_proto_rawDesc = "" +
 	"\x06status\x18\x06 \x01(\tR\x06status\x12\x14\n" +
 	"\x05price\x18\a \x01(\x01R\x05price\x12\x1b\n" +
 	"\tauthor_id\x18\b \x01(\x03R\bauthorId\x12%\n" +
-	"\x0etotal_distance\x18\t \x01(\x01R\rtotalDistance\".\n" +
+	"\x0etotal_distance\x18\t \x01(\x01R\rtotalDistance\x12Z\n" +
+	"\x15duration_by_transport\x18\n" +
+	" \x03(\v2&.TourResponse.DurationByTransportEntryR\x13durationByTransport\x1aF\n" +
+	"\x18DurationByTransportEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\x05R\x05value:\x028\x01\".\n" +
 	"\x12CreateTourResponse\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage\"s\n" +
 	"\x14CheckPositionRequest\x12!\n" +
@@ -538,7 +551,7 @@ func file_proto_tour_service_proto_rawDescGZIP() []byte {
 	return file_proto_tour_service_proto_rawDescData
 }
 
-var file_proto_tour_service_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_proto_tour_service_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_proto_tour_service_proto_goTypes = []any{
 	(*GetTourByIdRequest)(nil),    // 0: GetTourByIdRequest
 	(*CreateTourRequest)(nil),     // 1: CreateTourRequest
@@ -546,21 +559,23 @@ var file_proto_tour_service_proto_goTypes = []any{
 	(*CreateTourResponse)(nil),    // 3: CreateTourResponse
 	(*CheckPositionRequest)(nil),  // 4: CheckPositionRequest
 	(*TourExecutionResponse)(nil), // 5: TourExecutionResponse
-	nil,                           // 6: TourExecutionResponse.CompletedKeyPointsWithTimeEntry
+	nil,                           // 6: TourResponse.DurationByTransportEntry
+	nil,                           // 7: TourExecutionResponse.CompletedKeyPointsWithTimeEntry
 }
 var file_proto_tour_service_proto_depIdxs = []int32{
-	6, // 0: TourExecutionResponse.completed_key_points_with_time:type_name -> TourExecutionResponse.CompletedKeyPointsWithTimeEntry
-	0, // 1: TourService.GetTourById:input_type -> GetTourByIdRequest
-	1, // 2: TourService.CreateTour:input_type -> CreateTourRequest
-	4, // 3: TourExecutionService.CheckPosition:input_type -> CheckPositionRequest
-	2, // 4: TourService.GetTourById:output_type -> TourResponse
-	3, // 5: TourService.CreateTour:output_type -> CreateTourResponse
-	5, // 6: TourExecutionService.CheckPosition:output_type -> TourExecutionResponse
-	4, // [4:7] is the sub-list for method output_type
-	1, // [1:4] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	6, // 0: TourResponse.duration_by_transport:type_name -> TourResponse.DurationByTransportEntry
+	7, // 1: TourExecutionResponse.completed_key_points_with_time:type_name -> TourExecutionResponse.CompletedKeyPointsWithTimeEntry
+	0, // 2: TourService.GetTourById:input_type -> GetTourByIdRequest
+	1, // 3: TourService.CreateTour:input_type -> CreateTourRequest
+	4, // 4: TourExecutionService.CheckPosition:input_type -> CheckPositionRequest
+	2, // 5: TourService.GetTourById:output_type -> TourResponse
+	3, // 6: TourService.CreateTour:output_type -> CreateTourResponse
+	5, // 7: TourExecutionService.CheckPosition:output_type -> TourExecutionResponse
+	5, // [5:8] is the sub-list for method output_type
+	2, // [2:5] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_proto_tour_service_proto_init() }
@@ -574,7 +589,7 @@ func file_proto_tour_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_tour_service_proto_rawDesc), len(file_proto_tour_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   2,
 		},
