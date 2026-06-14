@@ -268,6 +268,24 @@ func getUserID(c *gin.Context) (int64, bool) {
 	return int64(userIDRaw.(int)), true
 }
 
+func (h *GatewayHandler) GetToursForTouristGrpc(c *gin.Context) {
+	touristID, ok := getUserID(c)
+	if !ok {
+		return
+	}
+
+	resp, err := h.purchaseGrpcClient.GetToursForTourist(context.Background(), &pb.GetToursForTouristRequest{
+		TouristId: touristID,
+	})
+	if err != nil {
+		log.Printf("[gRPC ERROR] GetToursForTourist: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp.Tours)
+}
+
 func (h *GatewayHandler) proxyRequest(c *gin.Context, targetURL string) {
 	bodyBytes, err := io.ReadAll(c.Request.Body)
 	if err != nil {

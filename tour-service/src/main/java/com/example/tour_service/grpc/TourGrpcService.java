@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @GrpcService
 public class TourGrpcService extends TourServiceGrpc.TourServiceImplBase {
@@ -58,4 +59,35 @@ public class TourGrpcService extends TourServiceGrpc.TourServiceImplBase {
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
+
+
+    @Override
+    public void getToursByIds(GetToursByIdsRequest request, StreamObserver<ToursListResponse> responseObserver) {
+
+        List<Long> ids = request.getIdsList();
+
+        List<TourResponse> tourResponses = ids.stream().map(id -> {
+            TourDTO dto = tourService.getTourById(id);
+            return TourResponse.newBuilder()
+                    .setId(dto.getId())
+                    .setName(dto.getName())
+                    .setDescription(dto.getDescription())
+                    .setDifficulty(dto.getDifficulty())
+                    .addAllTags(dto.getTags() != null ? dto.getTags() : List.of())
+                    .setStatus(dto.getStatus().name())
+                    .setPrice(dto.getPrice())
+                    .setAuthorId(dto.getAuthorId())
+                    .setTotalDistance(dto.getTotalDistance() != null ? dto.getTotalDistance() : 0.0)
+                    .build();
+        }).collect(Collectors.toList());
+
+        ToursListResponse response = ToursListResponse.newBuilder()
+                .addAllTours(tourResponses)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+
 }

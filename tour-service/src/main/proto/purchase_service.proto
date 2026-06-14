@@ -1,6 +1,6 @@
 syntax = "proto3";
-
 option go_package = "./proto";
+
 option java_multiple_files = true;
 option java_package = "com.example.purchase_service.proto";
 option java_outer_classname = "PurchaseServiceProto";
@@ -12,6 +12,7 @@ service PurchaseService {
   rpc GetCart (GetCartRequest) returns (CartResponse);
   rpc GetToursForTourist (GetToursForTouristRequest) returns (TouristToursResponse);
   rpc IsTourPurchased (IsTourPurchasedRequest) returns (IsTourPurchasedResponse);
+
 }
 
 message PurchasedTourResponse {

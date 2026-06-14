@@ -2,15 +2,10 @@ package com.example.purchase_service.grpc;
 
 import com.example.purchase_service.model.OrderItem;
 import com.example.purchase_service.model.ShoppingCart;
+import com.example.purchase_service.proto.*;
 import com.example.purchase_service.service.PurchaseService;
-import com.example.purchase_service.proto.AddToCartRequest;
-import com.example.purchase_service.proto.CartResponse;
-import com.example.purchase_service.proto.CheckoutRequest;
-import com.example.purchase_service.proto.GetCartRequest;
-import com.example.purchase_service.proto.CheckoutResponse;
 import com.example.purchase_service.proto.OrderItem.Builder;
-import com.example.purchase_service.proto.PurchaseServiceGrpc;
-import com.example.purchase_service.proto.RemoveFromCartRequest;
+import com.example.tour_service.proto.TourResponse;
 import io.grpc.stub.StreamObserver;
 import io.grpc.Status;
 import lombok.RequiredArgsConstructor;
@@ -101,4 +96,57 @@ public class PurchaseGrpcServer extends PurchaseServiceGrpc.PurchaseServiceImplB
 
         return builder.build();
     }
+
+
+    @Override
+    public void getToursForTourist(GetToursForTouristRequest request, StreamObserver<TouristToursResponse> responseObserver) {
+        try {
+            List<TourResponse> tours = purchaseService.getToursForTourist(request.getTouristId());
+
+            TouristToursResponse.Builder responseBuilder = TouristToursResponse.newBuilder();
+
+            for (TourResponse tour : tours) {
+                PurchasedTourResponse purchasedTour = PurchasedTourResponse.newBuilder()
+                        .setId(tour.getId())
+                        .setName(tour.getName())
+                        .setDescription(tour.getDescription())
+                        .setDifficulty(tour.getDifficulty())
+                        .addAllTags(tour.getTagsList())
+                        .setStatus(tour.getStatus())
+                        .setPrice(tour.getPrice())
+                        .setAuthorId(tour.getAuthorId())
+                        .setTotalDistance(tour.getTotalDistance())
+                        .build();
+
+                responseBuilder.addTours(purchasedTour);
+            }
+
+            responseObserver.onNext(responseBuilder.build());
+            responseObserver.onCompleted();
+
+        } catch (Exception e) {
+            responseObserver.onError(io.grpc.Status.INTERNAL
+                    .withDescription("greskica: " + e.getMessage())
+                    .asRuntimeException());
+        }
+    }
+
+    @Override
+    public void isTourPurchased(IsTourPurchasedRequest request, StreamObserver<IsTourPurchasedResponse> responseObserver) {
+        try {
+            boolean purchased = purchaseService.isTourPurchased(request.getTouristId(), request.getTourId());
+
+            IsTourPurchasedResponse response = IsTourPurchasedResponse.newBuilder()
+                    .setIsPurchased(purchased)
+                    .build();
+
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(Status.INTERNAL
+                    .withDescription("Greška pri proveri kupovine: " + e.getMessage())
+                    .asRuntimeException());
+        }
+    }
+
 }

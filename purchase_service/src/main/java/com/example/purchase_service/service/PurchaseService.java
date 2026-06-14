@@ -15,6 +15,7 @@ import com.example.tour_service.proto.TourServiceGrpc;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -121,5 +122,26 @@ public class PurchaseService {
                         .items(new ArrayList<>())
                         .totalPrice(0.0)
                         .build());
+    }
+
+
+
+    public List<TourResponse> getToursForTourist(Long touristId) {
+        List<TourPurchaseToken> tokens = tokenRepository.findByTouristId(touristId);
+
+
+        if (tokens.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<Long> tourIds = tokens.stream()
+                .map(TourPurchaseToken::getTourId)
+                .collect(Collectors.toList());
+
+        return tourClient.getToursByIds(tourIds);
+    }
+
+    public boolean isTourPurchased(Long touristId, Long tourId) {
+        return tokenRepository.existsByTouristIdAndTourId(touristId, tourId);
     }
 }

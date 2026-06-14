@@ -9,6 +9,7 @@ option java_outer_classname = "TourServiceProto";
 service TourService {
   rpc GetTourById (GetTourByIdRequest) returns (TourResponse);
   rpc CreateTour (CreateTourRequest) returns (CreateTourResponse);
+  rpc GetToursByIds (GetToursByIdsRequest) returns (ToursListResponse);
 }
 
 service TourExecutionService {
@@ -37,11 +38,19 @@ message TourResponse {
   double price = 7;
   int64 author_id = 8;
   double total_distance = 9;
-  map<string, int32> duration_by_transport = 10;  
+  map<string, int32> duration_by_transport = 10;
 }
 
 message CreateTourResponse {
   string message = 1;
+}
+
+message GetToursByIdsRequest {
+  repeated int64 ids = 1;
+}
+
+message ToursListResponse {
+  repeated TourResponse tours = 1;
 }
 
 message CheckPositionRequest {
@@ -60,5 +69,6 @@ message TourExecutionResponse {
   string last_activity_date_time = 7;
   double last_latitude = 8;
   double last_longitude = 9;
-  map<int64, string> completed_key_points_with_time = 10; // KLJUČNO ZA TVOJU MAPU!
+  map<int64, string> completed_key_points_with_time = 10;
 }
+
