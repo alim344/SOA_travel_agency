@@ -321,7 +321,7 @@ func getUserID(c *gin.Context) (int64, bool) {
 	return int64(userIDRaw.(int)), true
 }
 
-func (h *GatewayHandler) GetToursForTouristGrpc(c *gin.Context) {
+/*func (h *GatewayHandler) GetToursForTouristGrpc(c *gin.Context) {
 	touristID, ok := getUserID(c)
 	if !ok {
 		return
@@ -337,6 +337,48 @@ func (h *GatewayHandler) GetToursForTouristGrpc(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, resp.Tours)
+}*/
+
+func (h *GatewayHandler) GetToursForTouristGrpc(c *gin.Context) {
+	ctx, span := otel.Tracer(tracing.ServiceName).Start(c.Request.Context(), "GetToursForTourist")
+	defer span.End()
+
+	touristID, ok := getUserID(c)
+	if !ok {
+		return
+	}
+	span.SetAttributes(attribute.Int64("tourist.id", touristID))
+
+	resp, err := h.purchaseGrpcClient.GetToursForTourist(ctx, &pb.GetToursForTouristRequest{
+		TouristId: touristID,
+	})
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		log.Printf("[gRPC ERROR] GetToursForTourist: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	toursList := []gin.H{}
+	for _, t := range resp.Tours {
+		toursList = append(toursList, gin.H{
+			"id":                  t.Id,
+			"name":                t.Name,
+			"description":         t.Description,
+			"difficulty":          t.Difficulty,
+			"tags":                t.Tags,
+			"status":              t.Status,
+			"price":               t.Price,
+			"authorId":            t.AuthorId,
+			"totalDistance":       t.TotalDistance,
+			"durationByTransport": t.DurationByTransport,
+		})
+	}
+
+	span.SetStatus(codes.Ok, "Tours for tourist retrieved successfully")
+
+	c.JSON(http.StatusOK, toursList)
 }
 
 func (h *GatewayHandler) proxyRequest(c *gin.Context, targetURL string) {

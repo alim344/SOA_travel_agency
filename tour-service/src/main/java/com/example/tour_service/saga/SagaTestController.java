@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/saga-test")
+@RequestMapping("/tour/saga-test")
 public class SagaTestController {
 
 

@@ -168,6 +168,7 @@ func main() {
 	{
 		javneTure.GET("/getAllDtos", h.ProxyToTours)
 		javneTure.GET("/getAllActiveTours", h.ProxyToTours)
+		javneTure.POST("/saga-test/run/:id", h.ProxyToTours)
 	}
 
 	tour := router.Group("/tour")
@@ -184,6 +185,7 @@ func main() {
 		tour.GET("/:id", h.GetTourByIdGrpc) //
 		tour.PUT("/:id/price", h.ProxyToTours)
 		tour.PUT("/archiveByUser/:userId", h.ProxyToTours)
+
 	}
 
 	session := router.Group("/session")
