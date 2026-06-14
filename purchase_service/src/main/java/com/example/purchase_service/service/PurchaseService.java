@@ -30,19 +30,20 @@ public class PurchaseService {
         try {
             tour = tourClient.getTourById(tourId);
         } catch (StatusRuntimeException e) {
-            throw new RuntimeException("Tura sa ID " + tourId + " ne postoji.");
+            throw new RuntimeException("Tour not found.");
         }
 
         if ("ARCHIVED".equalsIgnoreCase(tour.getStatus())) {
-            throw new RuntimeException("Arhivirana tura se ne može dodati u korpu.");
+            throw new RuntimeException("This tour is not available for purchase.");
+
         }
 
         if (!"PUBLISHED".equalsIgnoreCase(tour.getStatus())) {
-            throw new RuntimeException("Tura nije objavljena.");
+            throw new RuntimeException("This tour is not available for purchase.");
         }
 
         if (tokenRepository.existsByTouristIdAndTourId(touristId, tourId)) {
-            throw new RuntimeException("Tura je već kupljena.");
+            throw new RuntimeException("You have already purchased this tour.");
         }
 
         ShoppingCart cart = cartRepository.findByTouristId(touristId)
@@ -55,7 +56,7 @@ public class PurchaseService {
         boolean alreadyInCart = cart.getItems().stream()
                 .anyMatch(item -> item.getTourId().equals(tourId));
         if (alreadyInCart) {
-            throw new RuntimeException("Tura je već u korpi.");
+            throw new RuntimeException("This tour is already in your cart.");
         }
 
         OrderItem newItem = OrderItem.builder()
@@ -74,7 +75,7 @@ public class PurchaseService {
 
     public ShoppingCart removeFromCart(Long touristId, Long tourId) {
         ShoppingCart cart = cartRepository.findByTouristId(touristId)
-                .orElseThrow(() -> new RuntimeException("Korpa ne postoji."));
+                .orElseThrow(() -> new RuntimeException("Cart not found."));
 
         cart.getItems().removeIf(item -> item.getTourId().equals(tourId));
         cart.setTotalPrice(cart.getItems().stream()
@@ -86,10 +87,10 @@ public class PurchaseService {
 
     public List<String> checkout(Long touristId) {
         ShoppingCart cart = cartRepository.findByTouristId(touristId)
-                .orElseThrow(() -> new RuntimeException("Korpa je prazna."));
+                .orElseThrow(() -> new RuntimeException("Your cart is empty."));
 
         if (cart.getItems().isEmpty()) {
-            throw new RuntimeException("Korpa je prazna.");
+            throw new RuntimeException("Your cart is empty.");
         }
 
         List<String> tokens = new ArrayList<>();
