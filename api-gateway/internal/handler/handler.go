@@ -10,12 +10,17 @@ import (
 	"strconv"
 	"strings"
 
+	"api-gateway/internal/tracing"
 	pb "api-gateway/proto"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 )
 
 type GatewayHandler struct {
@@ -173,24 +178,36 @@ func (h *GatewayHandler) CheckPositionGrpc(c *gin.Context) {
 }
 
 func (h *GatewayHandler) AddToCartGrpc(c *gin.Context) {
+
+	ctx, span := otel.Tracer(tracing.ServiceName).Start(c.Request.Context(), "AddToCart")
+	defer span.End()
+
 	touristID, ok := getUserID(c)
 	if !ok {
 		return
 	}
 
+	span.SetAttributes(attribute.Int64("tourist.id", touristID))
+
 	var body struct {
 		TourId int64 `json:"tour_id"`
 	}
 	if err := c.ShouldBindJSON(&body); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "Invalid request body")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}
 
-	resp, err := h.purchaseGrpcClient.AddToCart(context.Background(), &pb.AddToCartRequest{
+	span.SetAttributes(attribute.Int64("tour.id", body.TourId))
+
+	resp, err := h.purchaseGrpcClient.AddToCart(ctx, &pb.AddToCartRequest{
 		TouristId: touristID,
 		TourId:    body.TourId,
 	})
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		if st, ok := status.FromError(err); ok {
 			c.JSON(http.StatusBadRequest, gin.H{"error": st.Message()})
 		} else {
@@ -199,67 +216,99 @@ func (h *GatewayHandler) AddToCartGrpc(c *gin.Context) {
 		return
 	}
 
+	span.SetStatus(codes.Ok, "Tour added to cart")
 	c.JSON(http.StatusOK, resp)
 }
 
 func (h *GatewayHandler) GetCartGrpc(c *gin.Context) {
+	ctx, span := otel.Tracer(tracing.ServiceName).Start(c.Request.Context(), "GetCart")
+	defer span.End()
+
 	touristID, ok := getUserID(c)
 	if !ok {
 		return
 	}
 
-	resp, err := h.purchaseGrpcClient.GetCart(context.Background(), &pb.GetCartRequest{
+	span.SetAttributes(attribute.Int64("tourist.id", touristID))
+
+	resp, err := h.purchaseGrpcClient.GetCart(ctx, &pb.GetCartRequest{
 		TouristId: touristID,
 	})
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	span.SetStatus(codes.Ok, "Cart retrieved successfully")
 	c.JSON(http.StatusOK, resp)
 }
 
 func (h *GatewayHandler) RemoveFromCartGrpc(c *gin.Context) {
+	ctx, span := otel.Tracer(tracing.ServiceName).Start(c.Request.Context(), "RemoveFromCart")
+	defer span.End()
+
 	touristID, ok := getUserID(c)
 	if !ok {
 		return
 	}
+	span.SetAttributes(attribute.Int64("tourist.id", touristID))
 
 	var body struct {
 		TourId int64 `json:"tour_id"`
 	}
 	if err := c.ShouldBindJSON(&body); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "Invalid request body")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}
+	span.SetAttributes(attribute.Int64("tour.id", body.TourId))
 
-	resp, err := h.purchaseGrpcClient.RemoveFromCart(context.Background(), &pb.RemoveFromCartRequest{
+	resp, err := h.purchaseGrpcClient.RemoveFromCart(ctx, &pb.RemoveFromCartRequest{
 		TouristId: touristID,
 		TourId:    body.TourId,
 	})
 	if err != nil {
-		log.Printf("[gRPC ERROR] RemoveFromCart: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		if st, ok := status.FromError(err); ok {
+			c.JSON(http.StatusBadRequest, gin.H{"error": st.Message()})
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
 		return
 	}
 
+	span.SetStatus(codes.Ok, "Tour removed from cart")
 	c.JSON(http.StatusOK, resp)
 }
 
 func (h *GatewayHandler) CheckoutGrpc(c *gin.Context) {
+	ctx, span := otel.Tracer(tracing.ServiceName).Start(c.Request.Context(), "Checkout")
+	defer span.End()
+
 	touristID, ok := getUserID(c)
 	if !ok {
 		return
 	}
 
-	resp, err := h.purchaseGrpcClient.Checkout(context.Background(), &pb.CheckoutRequest{
+	span.SetAttributes(attribute.Int64("tourist.id", touristID))
+
+	resp, err := h.purchaseGrpcClient.Checkout(ctx, &pb.CheckoutRequest{
 		TouristId: touristID,
 	})
+
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		log.Printf("[gRPC ERROR] Checkout: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	span.SetAttributes(attribute.Int("tokens.count", len(resp.Tokens)))
+	span.SetStatus(codes.Ok, "Checkout completed successfully")
 	c.JSON(http.StatusOK, resp)
 }
 

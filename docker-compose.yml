@@ -120,12 +120,14 @@ services:
       TOUR_SERVICE_URL: http://tour-service:8085
       FOLLOWER_SERVICE_URL: http://follower-service:8084
       PURCHASE_GRPC_ADDR: purchase-service:9093
+      JAEGER_ENDPOINT: jaeger:4317
     depends_on:
       - stakeholders-service
       - blogs-service
       - follower-service
       - tour-service
       - purchase-service
+      - jaeger
 
   purchase-service:
     build: ./purchase_service
@@ -138,6 +140,26 @@ services:
     depends_on:
       - purchase-db
       - tour-service
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.53
+    container_name: jaeger
+    ports:
+      - "16686:16686"   # jaeger ui
+      - "4317:4317"     # otlp grpc gateway salje ovde
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - jaeger
 
 volumes:
   postgres_data:

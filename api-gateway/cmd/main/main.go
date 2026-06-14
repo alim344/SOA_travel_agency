@@ -1,17 +1,33 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 
 	"api-gateway/internal/handler"
 	"api-gateway/internal/middleware"
 
+	"api-gateway/internal/tracing"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 func main() {
+
+	//tracer pre svega
+	tp, err := tracing.InitTracer()
+	if err != nil {
+		log.Fatalf("Failed to initialize tracer: %v", err)
+	}
+	defer func() {
+		if err := tp.Shutdown(context.Background()); err != nil {
+			log.Printf("Error shutting down tracer: %v", err)
+		}
+	}()
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8000"
@@ -50,6 +66,7 @@ func main() {
 	authServiceURL := stakeholdersServiceURL
 
 	router := gin.Default()
+	router.Use(otelgin.Middleware(tracing.ServiceName))
 	router.SetTrustedProxies(nil)
 	router.RedirectTrailingSlash = false
 
