@@ -149,4 +149,28 @@ public class PurchaseGrpcServer extends PurchaseServiceGrpc.PurchaseServiceImplB
         }
     }
 
+
+    @Override
+    public void removeArchivedTourFromCarts(RemoveArchivedTourRequest request, StreamObserver<RemoveArchivedTourResponse> responseObserver) {
+        try {
+            purchaseService.removeTourFromAllCarts(request.getTourId());
+
+            RemoveArchivedTourResponse response = RemoveArchivedTourResponse.newBuilder()
+                    .setSuccess(true)
+                    .setMessage("SAGA: Uspešno uklonjena arhivirana tura iz svih korpi.")
+                    .build();
+
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            RemoveArchivedTourResponse response = RemoveArchivedTourResponse.newBuilder()
+                    .setSuccess(false)
+                    .setMessage("SAGA Greška: " + e.getMessage())
+                    .build();
+
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        }
+    }
+
 }

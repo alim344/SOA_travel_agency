@@ -1,8 +1,6 @@
 package com.example.tour_service.grpc;
 
-import com.example.purchase_service.proto.IsTourPurchasedRequest;
-import com.example.purchase_service.proto.IsTourPurchasedResponse;
-import com.example.purchase_service.proto.PurchaseServiceGrpc;
+import com.example.purchase_service.proto.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import jakarta.annotation.PostConstruct;
@@ -44,5 +42,13 @@ public class PurchaseServiceGrpcClient {
 
         IsTourPurchasedResponse response = stub.isTourPurchased(request);
         return response.getIsPurchased();
+    }
+
+    public RemoveArchivedTourResponse removeTourFromCarts(Long tourId) {
+        RemoveArchivedTourRequest request = RemoveArchivedTourRequest.newBuilder()
+                .setTourId(tourId)
+                .build();
+
+        return stub.removeArchivedTourFromCarts(request);
     }
 }

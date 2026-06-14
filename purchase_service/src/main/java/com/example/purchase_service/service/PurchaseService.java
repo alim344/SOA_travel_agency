@@ -145,4 +145,24 @@ public class PurchaseService {
     public boolean isTourPurchased(Long touristId, Long tourId) {
         return tokenRepository.existsByTouristIdAndTourId(touristId, tourId);
     }
+
+
+    public void removeTourFromAllCarts(Long tourId) {
+        List<ShoppingCart> allCarts = cartRepository.findAll();
+
+        for (ShoppingCart cart : allCarts) {
+            boolean hasTour = cart.getItems().stream()
+                    .anyMatch(item -> item.getTourId().equals(tourId));
+
+            if (hasTour) {
+                cart.getItems().removeIf(item -> item.getTourId().equals(tourId));
+
+                cart.setTotalPrice(cart.getItems().stream()
+                        .mapToDouble(OrderItem::getPrice)
+                        .sum());
+
+                cartRepository.save(cart);
+            }
+        }
+    }
 }

@@ -1,7 +1,9 @@
 package com.example.tour_service.service;
 
 
+import com.example.purchase_service.proto.RemoveArchivedTourResponse;
 import com.example.tour_service.DTO.TourDTO;
+import com.example.tour_service.grpc.PurchaseServiceGrpcClient;
 import com.example.tour_service.model.Tour;
 import com.example.tour_service.model.TourStatus;
 
@@ -23,6 +25,9 @@ public class TourService {
 
     @Autowired
     private TourRepository tourRepository;
+
+    @Autowired
+    private PurchaseServiceGrpcClient purchaseServiceClient;
 
 
     @Transactional
@@ -190,6 +195,9 @@ public class TourService {
         Tour savedTour = tourRepository.save(tour);
         return mapToResponseDTO(savedTour);
     }
+
+
+
 
     public TourDTO reactivateTour(Long id) {
         Tour tour = tourRepository.findById(id)

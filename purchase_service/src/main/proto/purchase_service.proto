@@ -12,6 +12,7 @@ service PurchaseService {
   rpc GetCart (GetCartRequest) returns (CartResponse);
   rpc GetToursForTourist (GetToursForTouristRequest) returns (TouristToursResponse);
   rpc IsTourPurchased (IsTourPurchasedRequest) returns (IsTourPurchasedResponse);
+  rpc RemoveArchivedTourFromCarts (RemoveArchivedTourRequest) returns (RemoveArchivedTourResponse);
 }
 
 message PurchasedTourResponse {
@@ -75,4 +76,13 @@ message IsTourPurchasedRequest {
 
 message IsTourPurchasedResponse {
   bool is_purchased = 1;
+}
+
+message RemoveArchivedTourRequest {
+  int64 tourId = 1;
+}
+
+message RemoveArchivedTourResponse {
+  bool success = 1;
+  string message = 2;
 }
