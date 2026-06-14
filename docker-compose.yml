@@ -141,14 +141,18 @@ services:
       - purchase-db
       - tour-service
 
-  jaeger:
-    image: jaegertracing/all-in-one:1.53
-    container_name: jaeger
+
+  # ─── MONITORING ───────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
     ports:
-      - "16686:16686"   # jaeger ui
-      - "4317:4317"     # otlp grpc gateway salje ovde
-    environment:
-      - COLLECTOR_OTLP_ENABLED=true
+      - "9091:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - cadvisor
+      - node-exporter
 
   grafana:
     image: grafana/grafana:latest
@@ -158,8 +162,44 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
     depends_on:
+      - prometheus
       - jaeger
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8082:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.53
+    container_name: jaeger
+    ports:
+      - "16686:16686"   # jaeger ui
+      - "4317:4317"     # otlp grpc gateway salje ovde
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
 
 volumes:
   postgres_data:
@@ -168,3 +208,4 @@ volumes:
   neo4j_logs:
   tour_db_data:
   purchase_db_data:
+  grafana_data:
