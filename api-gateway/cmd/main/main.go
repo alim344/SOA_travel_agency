@@ -106,6 +106,7 @@ func main() {
 		admin.GET("/getAccounts", h.ProxyToStakeholders)
 		admin.PATCH("/blockUser/:id", h.ProxyToStakeholders)
 		admin.PATCH("/unblockUser/:id", h.ProxyToStakeholders)
+		admin.PATCH("/blockUser-test-fail/:id", h.ProxyToStakeholders)
 	}
 
 	// ProfileController — @RequestMapping("/profiles")
