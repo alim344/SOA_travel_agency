@@ -15,7 +15,7 @@ public class PurchaseServiceGrpcClient {
     @Value("${purchase.grpc.host:purchase-service}")
     private String host;
 
-    @Value("${purchase.grpc.port:9091}") // Use the port where your purchase service runs
+    @Value("${purchase.grpc.port:9093}")
     private int port;
 
     private ManagedChannel channel;
