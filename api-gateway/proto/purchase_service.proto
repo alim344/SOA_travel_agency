@@ -2,6 +2,7 @@ syntax = "proto3";
 
 option go_package = "./proto";
 
+
 option java_multiple_files = true;
 option java_package = "com.example.purchase_service.proto";
 option java_outer_classname = "PurchaseServiceProto";
@@ -11,6 +12,22 @@ service PurchaseService {
   rpc RemoveFromCart (RemoveFromCartRequest) returns (CartResponse);
   rpc Checkout (CheckoutRequest) returns (CheckoutResponse);
   rpc GetCart (GetCartRequest) returns (CartResponse);
+  rpc GetToursForTourist (GetToursForTouristRequest) returns (TouristToursResponse);
+  rpc IsTourPurchased (IsTourPurchasedRequest) returns (IsTourPurchasedResponse);
+
+}
+
+message PurchasedTourResponse {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  int32 difficulty = 4;
+  repeated string tags = 5;
+  string status = 6;
+  double price = 7;
+  int64 author_id = 8;
+  double total_distance = 9;
+  map<string, int32> duration_by_transport = 10;
 }
 
 message AddToCartRequest {
@@ -44,4 +61,21 @@ message CheckoutResponse {
 
 message GetCartRequest {
   int64 tourist_id = 1;
+}
+
+message GetToursForTouristRequest {
+  int64 tourist_id = 1;
+}
+
+message TouristToursResponse {
+  repeated PurchasedTourResponse tours = 1;
+}
+
+message IsTourPurchasedRequest {
+  int64 tourist_id = 1;
+  int64 tour_id = 2;
+}
+
+message IsTourPurchasedResponse {
+  bool is_purchased = 1;
 }

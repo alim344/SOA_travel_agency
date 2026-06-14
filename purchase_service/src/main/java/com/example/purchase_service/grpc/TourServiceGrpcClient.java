@@ -1,14 +1,14 @@
 package com.example.purchase_service.grpc;
 
-import com.example.tour_service.proto.GetTourByIdRequest;
-import com.example.tour_service.proto.TourResponse;
-import com.example.tour_service.proto.TourServiceGrpc;
+import com.example.tour_service.proto.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class TourServiceGrpcClient {
@@ -42,5 +42,14 @@ public class TourServiceGrpcClient {
                 .setId(tourId)
                 .build();
         return stub.getTourById(request);
+    }
+
+    public List<TourResponse> getToursByIds(List<Long> tourIds) {
+        GetToursByIdsRequest request = GetToursByIdsRequest.newBuilder()
+                .addAllIds(tourIds)
+                .build();
+
+        ToursListResponse response = stub.getToursByIds(request);
+        return response.getToursList();
     }
 }
