@@ -15,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 )
 
 type GatewayHandler struct {
@@ -190,8 +191,11 @@ func (h *GatewayHandler) AddToCartGrpc(c *gin.Context) {
 		TourId:    body.TourId,
 	})
 	if err != nil {
-		log.Printf("[gRPC ERROR] AddToCart: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		if st, ok := status.FromError(err); ok {
+			c.JSON(http.StatusBadRequest, gin.H{"error": st.Message()})
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
 		return
 	}
 
