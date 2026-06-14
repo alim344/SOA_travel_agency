@@ -223,5 +223,37 @@ public class TourService {
         return mapToResponseDTO(savedTour);
     }
 
+    public int archiveToursByAuthor(Long authorId) {
+        List<TourDTO> authorTours = getToursByAuthor(authorId);
+
+        if (authorTours == null || authorTours.isEmpty()) {
+            return 0;
+        }
+
+        int archivedCount = 0;
+        int skippedDraftCount = 0;
+
+        for (TourDTO tour : authorTours) {
+
+            try {
+                if (tour.getStatus() == TourStatus.PUBLISHED) {
+                    archiveTour(tour.getId());
+                    archivedCount++;
+                } else {
+                    skippedDraftCount++;
+                    System.out.println("Skipping draft tour: " + tour.getId());
+                }
+
+
+            } catch (Exception e) {
+                System.err.println("Failed to archive tour " + tour.getId() + ": " + e.getMessage());
+                throw new RuntimeException("Failed to archive tour " + tour.getId() + ": " + e.getMessage());
+            }
+        }
+
+        System.out.println("Archived " + archivedCount + " published tours, skipped " + skippedDraftCount + " draft tours");
+        return archivedCount;
+    }
+
 
 }

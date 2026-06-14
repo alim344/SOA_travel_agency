@@ -98,4 +98,17 @@ public class TourController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/archiveByUser/{userId}")
+    public ResponseEntity<String> archiveToursByUser(@PathVariable Long userId) {
+        try {
+            int archivedCount = tourService.archiveToursByAuthor(userId);
+            if (archivedCount == 0) {
+                return ResponseEntity.ok("No tours found for user " + userId + " to archive");
+            }
+            return ResponseEntity.ok("Successfully archived " + archivedCount + " tours for user " + userId);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to archive tours: " + e.getMessage());
+        }
+    }
+
 }

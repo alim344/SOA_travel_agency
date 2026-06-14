@@ -183,6 +183,7 @@ func main() {
 		tour.POST("", h.CreateTourGrpc)     //
 		tour.GET("/:id", h.GetTourByIdGrpc) //
 		tour.PUT("/:id/price", h.ProxyToTours)
+		tour.PUT("/archiveByUser/:userId", h.ProxyToTours)
 	}
 
 	session := router.Group("/session")
