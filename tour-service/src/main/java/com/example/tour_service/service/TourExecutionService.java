@@ -2,6 +2,7 @@ package com.example.tour_service.service;
 
 import com.example.tour_service.DTO.LocationDTO;
 import com.example.tour_service.DTO.TourExecutionDTO;
+import com.example.tour_service.grpc.PurchaseServiceGrpcClient;
 import com.example.tour_service.model.KeyPoint;
 import com.example.tour_service.model.Tour;
 import com.example.tour_service.model.TourExecution;
@@ -22,10 +23,16 @@ public class TourExecutionService {
     @Autowired
     private TourService tourService;
 
+    @Autowired
+    private PurchaseServiceGrpcClient purchaseServiceClient;
+
     @Transactional
     public TourExecutionDTO startSession(Long touristId, Long tourId){
 
-        // PROVERI JEL TURA KUPLJENA U PURCHASE SERVISU
+        boolean isPurchased = purchaseServiceClient.isTourPurchased(touristId, tourId);
+        if (!isPurchased) {
+            throw new RuntimeException("Tura nije kupljena! Ne možete započeti sesiju.");
+        }
 
         TourExecution existing = tourExecutionRepository.findByTouristIdAndTourId(touristId,tourId);
 

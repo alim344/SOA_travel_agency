@@ -103,6 +103,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://tour-db:5432/tourdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+      PURCHASE_GRPC_HOST: purchase-service
+      PURCHASE_GRPC_PORT: "9093"
     depends_on:
       - tour-db
 
