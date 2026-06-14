@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+option go_package = "./proto";
+
+option java_multiple_files = true;
+option java_package = "com.example.tour_service.proto";
+option java_outer_classname = "TourServiceProto";
+
+service TourService {
+  rpc GetTourById (GetTourByIdRequest) returns (TourResponse);
+  rpc CreateTour (CreateTourRequest) returns (CreateTourResponse);
+}
+
+service TourExecutionService {
+  rpc CheckPosition (CheckPositionRequest) returns (TourExecutionResponse);
+}
+
+message GetTourByIdRequest {
+  int64 id = 1;
+}
+
+message CreateTourRequest {
+  string name = 1;
+  string description = 2;
+  int32 difficulty = 3;
+  repeated string tags = 4;
+  int64 author_id = 5;
+}
+
+message TourResponse {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  int32 difficulty = 4;
+  repeated string tags = 5;
+  string status = 6;
+  double price = 7;
+  int64 author_id = 8;
+  double total_distance = 9;
+  map<string, int32> duration_by_transport = 10;  
+}
+
+message CreateTourResponse {
+  string message = 1;
+}
+
+message CheckPositionRequest {
+  int64 execution_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+}
+
+message TourExecutionResponse {
+  int64 execution_id = 1;
+  int64 tourist_id = 2;
+  int64 tour_id = 3;
+  string status = 4;
+  string start_time = 5;
+  string end_time = 6;
+  string last_activity_date_time = 7;
+  double last_latitude = 8;
+  double last_longitude = 9;
+  map<int64, string> completed_key_points_with_time = 10; // KLJUČNO ZA TVOJU MAPU!
+}
